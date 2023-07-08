@@ -37,6 +37,9 @@ export class GoogleAuthService {
     );
     if (tokenString) {
       this.token = JSON.parse(tokenString);
+      this.token!.expirationTime = new Date(
+        this.token?.expirationTime as unknown as string
+      );
     }
   }
 
@@ -67,7 +70,7 @@ export class GoogleAuthService {
     const scopes = ['https://www.googleapis.com/auth/drive.file'];
     const CLIENT_ID = environment.GoogleClient.ClientId;
 
-    const CALLBACK_URL = `${window.location.host}/oauth2callback`;
+    const CALLBACK_URL = `${window.location.protocol}//${window.location.host}/oauth2callback`;
 
     return `https://accounts.google.com/o/oauth2/v2/auth?scope=${scopes.join(
       ' '
