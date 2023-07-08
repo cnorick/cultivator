@@ -57,7 +57,7 @@ export class GoogleSheetsService {
     map((res) => res.values.slice(1))
   );
 
-  private readonly transactionData$ = combineLatest([
+  public readonly transactionData$ = combineLatest([
     this.transactionHeaders$,
     this.transactionRows$,
   ]).pipe(map(([headers, rows]) => convertTableToDictArray(headers, rows)));

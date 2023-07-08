@@ -1,1 +1,1 @@
-<p>transactions works!</p>
+<div *ngFor="let t of transactions$ | async">{{t.account}}</div>

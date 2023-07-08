@@ -1,4 +1,7 @@
-export function convertTableToDictArray(headers: string[], data: string[][]) {
+export function convertTableToDictArray(
+  headers: string[],
+  data: string[][]
+): { [key: string]: any }[] {
   const normalizeHeader = (name: string) =>
     name.toLowerCase().replace(/\s/, '_');
 

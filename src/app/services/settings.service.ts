@@ -4,6 +4,8 @@ import { LocalStorageService } from './local-storage.service';
 
 export interface Settings {
   spreadsheetUrl?: string;
+  dateFormat?: string;
+  initialTransactionsLoaded?: number;
 }
 
 @Injectable({
@@ -12,10 +14,25 @@ export interface Settings {
 export class SettingsService {
   private static readonly SETTINGS_STORAGE_KEY = 'settings';
 
+  private readonly defaults: Settings = {
+    spreadsheetUrl: undefined,
+    dateFormat: undefined,
+    initialTransactionsLoaded: 20,
+  };
+
   private readonly settings$ = new BehaviorSubject<Settings>({});
 
   public readonly spreadsheetUrl$ = this.settings$.pipe(
     map((settings) => settings.spreadsheetUrl),
+    distinct()
+  );
+
+  public readonly initialTransactionsLoaded$ = this.settings$.pipe(
+    map(
+      (settings) =>
+        settings.initialTransactionsLoaded ??
+        this.defaults.initialTransactionsLoaded!
+    ),
     distinct()
   );
 
@@ -24,7 +41,9 @@ export class SettingsService {
       localStorage.getItem(SettingsService.SETTINGS_STORAGE_KEY) ?? '{}'
     );
 
-    this.settings$.next(storedSettings);
+    const settings = { ...this.defaults, ...storedSettings };
+
+    this.settings$.next(settings);
 
     combineLatest({ spreadsheetUrl: this.spreadsheetUrl$ }).subscribe(
       (settings: Settings) =>
