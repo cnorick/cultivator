@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthState } from '../types/auth-state';
 import { LocalStorageService } from './local-storage.service';
@@ -19,27 +20,39 @@ interface StoredGoogleToken {
 export class GoogleAuthService {
   private static readonly STORAGE_KEY = 'google_access_token';
 
-  private token?: StoredGoogleToken;
+  private readonly token$ = new BehaviorSubject<StoredGoogleToken | undefined>(
+    undefined
+  );
 
   /**
-   * Returns the access token if its valid, undefined otherwise.
+   * Emits the access token if its valid, undefined otherwise.
    */
-  public get accessToken(): string | undefined {
-    if (this.token && Date.now() >= this.token.expirationTime.getTime()) {
-      this.clearToken();
-    }
-    return this.token?.accessToken;
-  }
+  public readonly accessToken$ = this.token$.pipe(
+    map((token) =>
+      token && Date.now() >= token.expirationTime.getTime()
+        ? undefined
+        : token?.accessToken
+    )
+  );
+
+  public readonly loggedIn$ = this.token$.pipe(
+    map(
+      (token) =>
+        !!token?.accessToken && Date.now() < token.expirationTime.getTime()
+    )
+  );
 
   constructor(private localStorage: LocalStorageService) {
     const tokenString = this.localStorage.getItem(
       GoogleAuthService.STORAGE_KEY
     );
+
     if (tokenString) {
-      this.token = JSON.parse(tokenString);
-      this.token!.expirationTime = new Date(
-        this.token?.expirationTime as unknown as string
+      const storedToken: StoredGoogleToken = JSON.parse(tokenString);
+      storedToken.expirationTime = new Date(
+        storedToken.expirationTime as unknown as string
       );
+      this.token$.next(storedToken);
     }
   }
 
@@ -59,11 +72,13 @@ export class GoogleAuthService {
     const expirationTime = new Date();
     expirationTime.setSeconds(expirationTime.getSeconds() + newToken.expiresIn);
 
-    this.token = { accessToken: newToken.accessToken, expirationTime };
+    const storedToken = { accessToken: newToken.accessToken, expirationTime };
     this.localStorage.setItem(
       GoogleAuthService.STORAGE_KEY,
-      JSON.stringify(this.token)
+      JSON.stringify(storedToken)
     );
+
+    this.token$.next(storedToken);
   }
 
   public createAuthUrl(state?: AuthState) {
@@ -80,7 +95,7 @@ export class GoogleAuthService {
   }
 
   public clearToken() {
-    this.token = undefined;
+    this.token$.next(undefined);
     this.localStorage.removeItem(GoogleAuthService.STORAGE_KEY);
   }
 }

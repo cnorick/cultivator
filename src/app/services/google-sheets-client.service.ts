@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { GoogleAuthService } from './services/google-auth.service';
+import { GoogleAuthService } from './google-auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,11 +10,21 @@ export class GoogleSheetsClientService {
   private readonly version = 'v4';
   private readonly baseUrl = `${this.endpoint}/${this.version}/spreadsheets`;
 
-  constructor(private auth: GoogleAuthService, private http: HttpClient) {}
+  private accessToken: string | undefined;
+
+  constructor(private auth: GoogleAuthService, private http: HttpClient) {
+    this.auth.accessToken$.subscribe(
+      (accessToken) => (this.accessToken = accessToken)
+    );
+  }
 
   private get<T>(url: string) {
+    if (!this.accessToken) {
+      throw new Error('Not logged into Google.');
+    }
+
     return this.http.get<T>(url, {
-      headers: { Authorization: `Bearer ${this.auth.accessToken}` },
+      headers: { Authorization: `Bearer ${this.accessToken}` },
     });
   }
 
@@ -34,7 +44,7 @@ export class GoogleSheetsClientService {
     )?.[1];
   }
 
-  public getSheeIdFromUrl(url?: string) {
+  public getSheetIdFromUrl(url?: string) {
     return url?.match(/#gid=(\d)*/)?.[1];
   }
 }

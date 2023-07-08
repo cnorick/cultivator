@@ -1,30 +1,35 @@
 import { Injectable } from '@angular/core';
 import {
-  BehaviorSubject,
   combineLatest,
   filter,
   map,
   switchMap,
   withLatestFrom,
+  shareReplay,
 } from 'rxjs';
-import { GoogleSheetsClientService } from '../google-sheets-client.service';
+import { GoogleSheetsClientService } from './google-sheets-client.service';
 import { convertTableToDictArray } from '../utils/table-utils';
+import { SettingsService } from './settings.service';
+import { GoogleAuthService } from './google-auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GoogleSheetsService {
-  private spreadsheetUrl$ = new BehaviorSubject<string | undefined>(undefined);
-  private spreadsheetId$ = this.spreadsheetUrl$.pipe(
+  private readonly spreadsheetId$ = this.settings.spreadsheetUrl$.pipe(
     map((url) => this.googleClient.getSpreadsheetIdFromUrl(url))
   );
 
-  private allSheetsResponse$ = this.spreadsheetId$.pipe(
-    filter((id) => !!id),
-    switchMap((id) => this.googleClient.getAllSheets(id!))
+  private readonly allSheetsResponse$ = combineLatest([
+    this.spreadsheetId$,
+    this.auth.loggedIn$,
+  ]).pipe(
+    filter(([spreadsheetId, loggedIn]) => !!spreadsheetId && loggedIn),
+    switchMap(([id]) => this.googleClient.getAllSheets(id!)),
+    shareReplay()
   );
 
-  private transactionsSheetInfo$ = this.allSheetsResponse$.pipe(
+  private readonly transactionsSheetInfo$ = this.allSheetsResponse$.pipe(
     map((res) =>
       res.sheets.find((sheet: any) =>
         sheet.developerMetadata?.some(
@@ -36,35 +41,35 @@ export class GoogleSheetsService {
     )
   );
 
-  private transactionValuesRes$ = this.transactionsSheetInfo$.pipe(
+  private readonly transactionValuesRes$ = this.transactionsSheetInfo$.pipe(
     withLatestFrom(this.spreadsheetId$),
     switchMap(([info, id]) =>
       this.googleClient.getSpreadsheetValues(id!, info.properties.title)
-    )
+    ),
+    shareReplay()
   );
 
-  private transactionHeaders$ = this.transactionValuesRes$.pipe(
+  private readonly transactionHeaders$ = this.transactionValuesRes$.pipe(
     map((res) => res.values[0])
   );
 
-  private transactionRows$ = this.transactionValuesRes$.pipe(
+  private readonly transactionRows$ = this.transactionValuesRes$.pipe(
     map((res) => res.values.slice(1))
   );
 
-  private transactionData$ = combineLatest([
+  private readonly transactionData$ = combineLatest([
     this.transactionHeaders$,
     this.transactionRows$,
   ]).pipe(map(([headers, rows]) => convertTableToDictArray(headers, rows)));
 
-  constructor(private googleClient: GoogleSheetsClientService) {
+  constructor(
+    private googleClient: GoogleSheetsClientService,
+    private settings: SettingsService,
+    private auth: GoogleAuthService
+  ) {
     this.allSheetsResponse$.subscribe((res) => console.log(res));
     this.transactionsSheetInfo$.subscribe((res) => console.log(res));
     this.transactionValuesRes$.subscribe((res) => console.log(res));
     this.transactionData$.subscribe((res) => console.log(res));
-  }
-
-  public setSpreadsheetUrl(url: string) {
-    // TODO: save to local storage
-    this.spreadsheetUrl$.next(url);
   }
 }
