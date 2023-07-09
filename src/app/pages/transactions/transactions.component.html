@@ -1,1 +1,29 @@
-<div *ngFor="let t of transactions$ | async">{{t.account}}</div>
+<ng-container *ngIf="transactions$ | async as transactions; else spinner">
+
+  <div *ngFor="let t of transactions">{{t.account}}</div>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Actions Buttons</mat-card-title>
+      <mat-card-subtitle>Start</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-actions>
+      <button mat-button>LIKE</button>
+      <button mat-button>SHARE</button>
+    </mat-card-actions>
+  </mat-card>
+  <br>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Actions Buttons</mat-card-title>
+      <mat-card-subtitle>End</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-actions align="end">
+      <button mat-button>LIKE</button>
+      <button mat-button>SHARE</button>
+    </mat-card-actions>
+  </mat-card>
+</ng-container>
+<ng-template #spinner>
+  Loading Transactions...
+  <mat-spinner></mat-spinner>
+</ng-template>

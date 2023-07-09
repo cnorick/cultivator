@@ -1,10 +1,14 @@
 import { Component } from '@angular/core';
+import { startWith } from 'rxjs';
+import { GoogleAuthService } from './services/google-auth.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.less']
+  styleUrls: ['./app.component.less'],
 })
 export class AppComponent {
-  title = 'tiller-web-app';
+  constructor(private auth: GoogleAuthService) {}
+
+  readonly loggedIn$ = this.auth.loggedIn$.pipe(startWith(false));
 }

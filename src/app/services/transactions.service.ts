@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, map } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
 import { Transaction } from '../types/transaction';
 import { GoogleSheetsService } from './google-sheets.service';
 import { SettingsService } from './settings.service';
@@ -41,5 +41,8 @@ export class TransactionsService {
   public readonly shownTransactions$ = combineLatest([
     this.transactions$,
     this.limit$,
-  ]).pipe(map(([transactions, limit]) => transactions.slice(0, limit)));
+  ]).pipe(
+    map(([transactions, limit]) => transactions.slice(0, limit)),
+    startWith(null)
+  );
 }
