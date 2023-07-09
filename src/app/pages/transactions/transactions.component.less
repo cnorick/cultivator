@@ -1,6 +1,7 @@
 :host {
   margin: 1em;
   display: flex;
+  flex-direction: column;
 }
 
 mat-spinner {
@@ -9,4 +10,24 @@ mat-spinner {
 
 .uncategorized {
   color: red;
+}
+
+a {
+  color: unset;
+  text-decoration: none;
+}
+
+mat-card {
+  margin-bottom: 1em;
+}
+
+mat-card-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  .content-block {
+    display: flex;
+    flex-direction: column;
+  }
 }
