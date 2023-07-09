@@ -10,6 +10,12 @@ import { Transaction } from '../types/transaction';
 import { GoogleSheetsService } from './google-sheets.service';
 import { SettingsService } from './settings.service';
 
+export type TransactionFilter = (
+  transaction: Transaction,
+  index?: number,
+  transactions?: Transaction[]
+) => boolean;
+
 @Injectable({
   providedIn: 'root',
 })
@@ -24,6 +30,8 @@ export class TransactionsService {
     this.loadMoreSteps$,
     this.settings.initialTransactionsLoaded$,
   ]).pipe(map(([loadMoreSteps, stepSize]) => loadMoreSteps * stepSize));
+
+  private filters$ = new BehaviorSubject<TransactionFilter[]>([]);
 
   public readonly transactions$ = this.googleSheets.transactionData$.pipe(
     map(
@@ -51,8 +59,18 @@ export class TransactionsService {
   public readonly shownTransactions$ = combineLatest([
     this.transactions$,
     this.limit$,
+    this.filters$,
   ]).pipe(
-    map(([transactions, limit]) => transactions.slice(0, limit)),
-    startWith(null)
+    map(([transactions, limit, filters]) =>
+      filters
+        .reduce((acc, filter) => acc.filter(filter), transactions)
+        .slice(0, limit)
+    ),
+    startWith(null),
+    shareReplay()
   );
+
+  public setFilters(filters: TransactionFilter[]) {
+    this.filters$.next(filters);
+  }
 }

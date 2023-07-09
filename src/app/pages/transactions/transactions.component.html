@@ -1,3 +1,8 @@
+<mat-toolbar>
+  <mat-chip-listbox aria-label="Fish selection" multiple (change)="updateFilters($event)">
+    <mat-chip-option *ngFor="let filter of allFilters" [value]="filter">{{filter.name}}</mat-chip-option>
+  </mat-chip-listbox>
+</mat-toolbar>
 <ng-container *ngIf="transactions$ | async as transactions; else spinner">
   <mat-card *ngFor="let t of transactions">
     <a [routerLink]="t.transaction_id">

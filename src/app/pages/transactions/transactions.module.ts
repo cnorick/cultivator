@@ -7,6 +7,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MoreInfoComponent } from './more-info/more-info.component';
 import { ComponentsModule } from 'src/app/components/components.module';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatChipsModule } from '@angular/material/chips';
 
 @NgModule({
   declarations: [TransactionsComponent, MoreInfoComponent],
@@ -17,6 +19,8 @@ import { ComponentsModule } from 'src/app/components/components.module';
     MatButtonModule,
     MatProgressSpinnerModule,
     ComponentsModule,
+    MatToolbarModule,
+    MatChipsModule,
   ],
 })
 export class TransactionsModule {}
