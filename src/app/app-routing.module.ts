@@ -14,12 +14,25 @@ const routes: Routes = [
         (m) => m.TransactionsModule
       ),
     canActivate: [authGuard],
+    data: {
+      breadcrumb: 'Transactions',
+    },
   },
-  { path: 'settings', component: SettingsComponent },
+  {
+    path: 'settings',
+    component: SettingsComponent,
+
+    data: {
+      breadcrumb: 'Settings',
+    },
+  },
   {
     path: 'login',
     loadChildren: () =>
       import('./pages/login/login.module').then((m) => m.LoginModule),
+    data: {
+      breadcrumb: 'Login',
+    },
   },
   { path: '', redirectTo: '/transactions', pathMatch: 'full' },
   { path: '**', component: PageNotFoundComponent },

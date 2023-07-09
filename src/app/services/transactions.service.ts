@@ -24,7 +24,9 @@ export class TransactionsService {
       transactions.map<Transaction>((t) => ({
         account: t['account'],
         'account_#': t['account_#'],
-        amount: Number.parseFloat(t['amount']),
+        amount: Math.abs(
+          Number.parseFloat(t['amount'].replace('$', '').replace(',', ''))
+        ),
         category: t['category'],
         check_number: t['check_number'],
         date: new Date(t['date']),

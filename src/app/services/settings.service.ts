@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, distinct, map } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  distinctUntilChanged,
+  map,
+} from 'rxjs';
 import { LocalStorageService } from './local-storage.service';
 
 export interface Settings {
@@ -24,7 +29,7 @@ export class SettingsService {
 
   public readonly spreadsheetUrl$ = this.settings$.pipe(
     map((settings) => settings.spreadsheetUrl),
-    distinct()
+    distinctUntilChanged()
   );
 
   public readonly initialTransactionsLoaded$ = this.settings$.pipe(
@@ -33,7 +38,7 @@ export class SettingsService {
         settings.initialTransactionsLoaded ??
         this.defaults.initialTransactionsLoaded!
     ),
-    distinct()
+    distinctUntilChanged()
   );
 
   constructor(localStorage: LocalStorageService) {

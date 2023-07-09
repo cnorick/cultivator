@@ -1,28 +1,33 @@
-<ng-container *ngIf="transactions$ | async as transactions; else spinner">
+<div>
+  <ng-container *ngIf="transactions$ | async as transactions; else spinner">
+    <mat-card *ngFor="let t of transactions">
+      <mat-card-header>
+        <mat-card-title>{{t.full_description}}</mat-card-title>
+        <mat-card-subtitle>
+          {{t.amount | currency}}&nbsp;|
+          <ng-container *ngIf="t.category; else uncategorized">
+            {{t.category}}
+          </ng-container>
+          <ng-template #uncategorized><span class="uncategorized">uncategorized</span></ng-template>
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-actions>
+        <button mat-button [routerLink]="t.transaction_id">More</button>
+      </mat-card-actions>
+    </mat-card>
+    <br>
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Actions Buttons</mat-card-title>
+        <mat-card-subtitle>End</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-actions align="end">
+        <button mat-button>LIKE</button>
+      </mat-card-actions>
+    </mat-card>
+  </ng-container>
+</div>
 
-  <div *ngFor="let t of transactions">{{t.account}}</div>
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Actions Buttons</mat-card-title>
-      <mat-card-subtitle>Start</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-actions>
-      <button mat-button>LIKE</button>
-      <button mat-button>SHARE</button>
-    </mat-card-actions>
-  </mat-card>
-  <br>
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>Actions Buttons</mat-card-title>
-      <mat-card-subtitle>End</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-actions align="end">
-      <button mat-button>LIKE</button>
-      <button mat-button>SHARE</button>
-    </mat-card-actions>
-  </mat-card>
-</ng-container>
 <ng-template #spinner>
   Loading Transactions...
   <mat-spinner></mat-spinner>

@@ -1,0 +1,8 @@
+<div class="breadcrumb">
+  <ng-container *ngFor="let breadcrumb of breadcrumbs; last as isLast">
+    <a class="crumb" [routerLink]="breadcrumb.url" routerLinkActive="router-link-active">
+      {{ breadcrumb.label }}
+    </a>
+    <span *ngIf="!isLast" class="arrow">></span>
+  </ng-container>
+</div>
