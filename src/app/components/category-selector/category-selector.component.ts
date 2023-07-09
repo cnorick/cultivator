@@ -11,12 +11,14 @@ import { Category } from 'src/app/types/category';
 })
 export class CategorySelectorComponent {
   @Input() selectedCategory?: string;
-  categoryCtl = new FormControl(this.selectedCategory);
+  categoryCtl = new FormControl(this.selectedCategory || 'None');
 
   constructor(private categoryService: CategoryService) {}
 
   filteredCategories$ = combineLatest([
-    this.categoryService.categories$,
+    this.categoryService.categories$.pipe(
+      map((categories) => [{ category: 'None' } as Category, ...categories])
+    ),
     this.categoryCtl.valueChanges.pipe(startWith('')),
   ]).pipe(
     map(([categories, searchString]) =>
