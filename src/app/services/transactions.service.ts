@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, startWith } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  map,
+  shareReplay,
+  startWith,
+} from 'rxjs';
 import { Transaction } from '../types/transaction';
 import { GoogleSheetsService } from './google-sheets.service';
 import { SettingsService } from './settings.service';
@@ -19,24 +25,26 @@ export class TransactionsService {
     this.settings.initialTransactionsLoaded$,
   ]).pipe(map(([loadMoreSteps, stepSize]) => loadMoreSteps * stepSize));
 
-  private readonly transactions$ = this.googleSheets.transactionData$.pipe(
-    map((transactions) =>
-      transactions.map<Transaction>((t) => ({
-        account: t['account'],
-        'account_#': t['account_#'],
-        amount: Math.abs(
-          Number.parseFloat(t['amount'].replace('$', '').replace(',', ''))
-        ),
-        category: t['category'],
-        check_number: t['check_number'],
-        date: new Date(t['date']),
-        date_added: new Date(t['date_added']),
-        description: t['description'],
-        full_description: t['full_description'],
-        institution: t['institution'],
-        notes: t['notes'],
-        transaction_id: t['transaction_id'],
-      }))
+  public readonly transactions$ = this.googleSheets.transactionData$.pipe(
+    map(
+      (transactions) =>
+        transactions.map<Transaction>((t) => ({
+          account: t['account'],
+          'account_#': t['account_#'],
+          amount: Math.abs(
+            Number.parseFloat(t['amount'].replace('$', '').replace(',', ''))
+          ),
+          category: t['category'],
+          check_number: t['check_number'],
+          date: new Date(t['date']),
+          date_added: new Date(t['date_added']),
+          description: t['description'],
+          full_description: t['full_description'],
+          institution: t['institution'],
+          notes: t['notes'],
+          transaction_id: t['transaction_id'],
+        })),
+      shareReplay()
     )
   );
 

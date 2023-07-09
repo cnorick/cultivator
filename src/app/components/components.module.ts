@@ -5,6 +5,7 @@ import { GoogleAuthComponent } from './google-auth/google-auth.component';
 import { AuthCallbackComponent } from './auth-callback/auth-callback.component';
 import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { RouterModule } from '@angular/router';
+import { CategorySelectorComponent } from './category-selector/category-selector.component';
 
 @NgModule({
   declarations: [
@@ -12,6 +13,7 @@ import { RouterModule } from '@angular/router';
     GoogleAuthComponent,
     AuthCallbackComponent,
     BreadcrumbsComponent,
+    CategorySelectorComponent,
   ],
   imports: [CommonModule, RouterModule],
   exports: [
@@ -19,6 +21,7 @@ import { RouterModule } from '@angular/router';
     GoogleAuthComponent,
     AuthCallbackComponent,
     BreadcrumbsComponent,
+    CategorySelectorComponent,
   ],
 })
 export class ComponentsModule {}
