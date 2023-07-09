@@ -1,1 +1,13 @@
-<p>category-selector works!</p>
+<mat-form-field class="example-full-width">
+  <mat-label>Category</mat-label>
+  <input type="text" placeholder="Pick one" matInput [matAutocomplete]="auto" [value]="selectedCategory"
+    [formControl]="categoryCtl">
+  <mat-autocomplete #auto="matAutocomplete">
+    <mat-option *ngFor="let c of filteredCategories$ | async" [value]="c.category">
+      <span class="option-container">
+        <span class="category">{{c.category}}</span>
+        <small class="group">{{c.group}}</small>
+      </span>
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>

@@ -38,10 +38,33 @@ export class GoogleSheetsService {
             JSON.parse(metadata.metadataValue)?.sheetInfo?.id === 'transactions'
         )
       )
-    )
+    ),
+    shareReplay()
+  );
+
+  private readonly categorySheetInfo$ = this.allSheetsResponse$.pipe(
+    map((res) =>
+      res.sheets.find((sheet: any) =>
+        sheet.developerMetadata?.some(
+          (metadata: any) =>
+            metadata.metadataKey === 'tiller' &&
+            JSON.parse(metadata.metadataValue)?.sheetInfo?.id ===
+              'categoriesBudget'
+        )
+      )
+    ),
+    shareReplay()
   );
 
   private readonly transactionValuesRes$ = this.transactionsSheetInfo$.pipe(
+    withLatestFrom(this.spreadsheetId$),
+    switchMap(([info, id]) =>
+      this.googleClient.getSpreadsheetValues(id!, info.properties.title)
+    ),
+    shareReplay()
+  );
+
+  private readonly categoryValuesRes$ = this.categorySheetInfo$.pipe(
     withLatestFrom(this.spreadsheetId$),
     switchMap(([info, id]) =>
       this.googleClient.getSpreadsheetValues(id!, info.properties.title)
@@ -57,9 +80,22 @@ export class GoogleSheetsService {
     map((res) => res.values.slice(1))
   );
 
+  private readonly categoryHeaders$ = this.categoryValuesRes$.pipe(
+    map((res) => res.values[0])
+  );
+
+  private readonly categoryRows$ = this.categoryValuesRes$.pipe(
+    map((res) => res.values.slice(1))
+  );
+
   public readonly transactionData$ = combineLatest([
     this.transactionHeaders$,
     this.transactionRows$,
+  ]).pipe(map(([headers, rows]) => convertTableToDictArray(headers, rows)));
+
+  public readonly categoryData$ = combineLatest([
+    this.categoryHeaders$,
+    this.categoryRows$,
   ]).pipe(map(([headers, rows]) => convertTableToDictArray(headers, rows)));
 
   constructor(
@@ -71,5 +107,8 @@ export class GoogleSheetsService {
     this.transactionsSheetInfo$.subscribe((res) => console.log(res));
     this.transactionValuesRes$.subscribe((res) => console.log(res));
     this.transactionData$.subscribe((res) => console.log(res));
+    this.categorySheetInfo$.subscribe((res) => console.log(res));
+    this.categoryValuesRes$.subscribe((res) => console.log(res));
+    this.categoryData$.subscribe((res) => console.log(res));
   }
 }

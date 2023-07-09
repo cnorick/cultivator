@@ -1,7 +1,7 @@
 <ng-container *ngIf="transaction$ | async as t else spinner">
   <h1>{{t.description}}</h1>
   <span>{{t.date | date}}</span>
-  <app-category-selector></app-category-selector>
+  <app-category-selector [selectedCategory]="t.category"></app-category-selector>
 
 </ng-container>
 <ng-template #spinner>
