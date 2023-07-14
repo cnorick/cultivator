@@ -12,7 +12,8 @@
     <span><small class="label">Check Number:</small> {{t.check_number}}</span>
     <span><small class="label">Date Added:</small> {{t.date_added | date}}</span>
     <span><small class="label">Notes:</small> {{t.notes}}</span>
-    <app-category-selector [selectedCategory]="t.category"></app-category-selector>
+    <app-category-selector (selectedCategoryChange)="onSelectedCategoryChange($event, t)"
+      [selectedCategory]="t.category"></app-category-selector>
   </div>
 
 

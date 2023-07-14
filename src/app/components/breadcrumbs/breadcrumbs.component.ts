@@ -56,7 +56,6 @@ export class BreadcrumbsComponent implements OnInit {
     // If the route is dynamic route such as ':id', remove it
     const lastRoutePart = path!.split('/').pop();
     const isDynamicRoute = lastRoutePart!.startsWith(':');
-    debugger;
     if (isDynamicRoute && !!route.snapshot) {
       const paramName = lastRoutePart!.split(':')[1];
       path = path!.replace(lastRoutePart!, route.snapshot.params[paramName]);
@@ -80,7 +79,6 @@ export class BreadcrumbsComponent implements OnInit {
       //there will be more children to look after, to build our breadcumb
       return this.buildBreadCrumb(route.firstChild, nextUrl, newBreadcrumbs);
     }
-    console.log(newBreadcrumbs);
     return newBreadcrumbs;
   }
 }

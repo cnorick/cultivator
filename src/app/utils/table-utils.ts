@@ -1,13 +1,16 @@
 export function convertTableToDictArray(
-  headers: string[],
-  data: string[][]
+  headers: (string | number)[],
+  data: (string | number)[][]
 ): { [key: string]: string }[] {
-  const normalizeHeader = (name: string) =>
-    name.toLowerCase().replace(/\s/, '_');
-
   const cleanHeaders = headers.map((h) => normalizeHeader(h));
 
   return data.map((row) =>
     row.reduce((acc, col, i) => ({ ...acc, [cleanHeaders[i]]: col }), {})
   );
+}
+
+export function normalizeHeader(header: string | number) {
+  return typeof header === 'string'
+    ? header.toLowerCase().replace(/\s/, '_')
+    : header;
 }

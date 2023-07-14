@@ -12,4 +12,6 @@ export interface Transaction {
   institution?: string;
   notes?: string;
   transaction_id?: string;
+  sheetsRow: number; // 1-indexed
+  original: any;
 }

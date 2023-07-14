@@ -1,6 +1,14 @@
-import { Component, Input } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { combineLatest, map, startWith } from 'rxjs';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { combineLatest, map, startWith, Subject, takeUntil } from 'rxjs';
 import { CategoryService } from 'src/app/services/category.service';
 import { Category } from 'src/app/types/category';
 
@@ -9,13 +17,30 @@ import { Category } from 'src/app/types/category';
   templateUrl: './category-selector.component.html',
   styleUrls: ['./category-selector.component.less'],
 })
-export class CategorySelectorComponent {
+export class CategorySelectorComponent implements OnInit, OnDestroy {
   @Input() selectedCategory?: string;
-  categoryCtl = new FormControl(this.selectedCategory || 'None');
+  @Output() selectedCategoryChange = new EventEmitter<Category>();
 
-  constructor(private categoryService: CategoryService) {}
+  private destroy$ = new Subject<void>();
+  categoryCtl = new FormControl('None');
+  filteredCategories: Category[] = [];
 
-  filteredCategories$ = combineLatest([
+  constructor(private categoryService: CategoryService) {
+    this.filteredCategories$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((categories) => (this.filteredCategories = categories));
+  }
+
+  ngOnInit(): void {
+    this.categoryCtl.setValue(this.selectedCategory || 'None');
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private filteredCategories$ = combineLatest([
     this.categoryService.categories$.pipe(
       map((categories) => [{ category: 'None' } as Category, ...categories])
     ),
@@ -25,15 +50,51 @@ export class CategorySelectorComponent {
       searchString
         ? this.filterCategories(categories, searchString)
         : categories.slice()
+    ),
+    map((filteredCategories) =>
+      filteredCategories.sort((a, b) => a.category.localeCompare(b.category))
     )
   );
 
   private filterCategories(categories: Category[], value: string): Category[] {
-    const filterValue = value.toLowerCase();
-    return categories.filter(
-      (c) =>
-        c.category?.toLowerCase().includes(value) ||
-        c.group?.toLowerCase().includes(filterValue)
+    const filterTokens = value.toLowerCase().split(/\W/).filter(Boolean);
+    return categories.filter((c) =>
+      filterTokens.every(
+        (token) =>
+          c.category?.toLowerCase().includes(token) ||
+          c.group?.toLowerCase().includes(token)
+      )
     );
+  }
+
+  onCategoryChange(event: MatAutocompleteSelectedEvent) {
+    this.setCategory(event.option.value);
+  }
+
+  private setCategory(categoryString: string) {
+    const category = this.filteredCategories?.find(
+      (c) => c.category === categoryString
+    );
+    if (category?.category === this.selectedCategory) {
+      return;
+    } else if (category?.category === 'None') {
+      this.selectedCategoryChange.emit({ category: '' } as any);
+    } else if (category) {
+      this.selectedCategoryChange.emit(category);
+    }
+
+    this.selectedCategory = categoryString;
+  }
+
+  onInputFocus(event: FocusEvent) {
+    (event.target as any).select();
+  }
+
+  onInputSubmit() {
+    if (this.filteredCategories.length) {
+      const categoryString = this.filteredCategories[0].category;
+      this.categoryCtl.setValue(categoryString);
+      this.setCategory(categoryString);
+    }
   }
 }

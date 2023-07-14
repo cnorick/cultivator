@@ -6,7 +6,9 @@ import {
   shareReplay,
   startWith,
 } from 'rxjs';
+import { Category } from '../types/category';
 import { Transaction } from '../types/transaction';
+import { convertDataDictToTransaction } from '../utils/transaction-converter';
 import { GoogleSheetsService } from './google-sheets.service';
 import { SettingsService } from './settings.service';
 
@@ -34,26 +36,12 @@ export class TransactionsService {
   private filters$ = new BehaviorSubject<TransactionFilter[]>([]);
 
   public readonly transactions$ = this.googleSheets.transactionData$.pipe(
-    map(
-      (transactions) =>
-        transactions.map<Transaction>((t) => ({
-          account: t['account'],
-          'account_#': t['account_#'],
-          amount: Math.abs(
-            Number.parseFloat(t['amount'].replace('$', '').replace(',', ''))
-          ),
-          category: t['category'],
-          check_number: t['check_number'],
-          date: new Date(t['date']),
-          date_added: new Date(t['date_added']),
-          description: t['description'],
-          full_description: t['full_description'],
-          institution: t['institution'],
-          notes: t['notes'],
-          transaction_id: t['transaction_id'],
-        })),
-      shareReplay()
-    )
+    map((transactions) =>
+      transactions.map<Transaction>((t, i) =>
+        convertDataDictToTransaction(t, i)
+      )
+    ),
+    shareReplay()
   );
 
   public readonly shownTransactions$ = combineLatest([
@@ -72,5 +60,11 @@ export class TransactionsService {
 
   public setFilters(filters: TransactionFilter[]) {
     this.filters$.next(filters);
+  }
+
+  public updateCategory(transaction: Transaction, category: Category) {
+    const dataDict = { ...transaction.original, category: category.category };
+
+    this.googleSheets.updateTransactionsRow(transaction.sheetsRow, dataDict);
   }
 }

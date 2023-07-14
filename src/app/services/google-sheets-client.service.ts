@@ -28,13 +28,26 @@ export class GoogleSheetsClientService {
     });
   }
 
+  private put<T>(url: string, body: any) {
+    if (!this.accessToken) {
+      throw new Error('Not logged into Google.');
+    }
+
+    return this.http.put<T>(url, body, {
+      headers: { Authorization: `Bearer ${this.accessToken}` },
+    });
+  }
+
   public getAllSheets(spreadsheetId: string) {
     return this.get<any>(`${this.baseUrl}/${spreadsheetId}`);
   }
 
+  /**
+   * https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/get
+   */
   public getSpreadsheetValues(spreadsheetId: string, sheetTitle: string) {
     return this.get<any>(
-      `${this.baseUrl}/${spreadsheetId}/values/${sheetTitle}`
+      `${this.baseUrl}/${spreadsheetId}/values/${sheetTitle}?valueRenderOption=UNFORMATTED_VALUE`
     );
   }
 
@@ -46,5 +59,28 @@ export class GoogleSheetsClientService {
 
   public getSheetIdFromUrl(url?: string) {
     return url?.match(/#gid=(\d)*/)?.[1];
+  }
+
+  /**
+   *
+   * @param spreadsheetId
+   * @param sheetTitle
+   * @param rowNum the 1-based row number, corresponding to the sheet row number
+   * @param data
+   * @returns
+   */
+  public updateRow(
+    spreadsheetId: string,
+    sheetTitle: string,
+    rowNum: number,
+    data: any[]
+  ) {
+    const formattedRange = `${sheetTitle}!${rowNum}:${rowNum}`;
+    return this.put(
+      `${this.baseUrl}/${spreadsheetId}/values/${formattedRange}?valueInputOption=RAW`,
+      {
+        values: [data],
+      }
+    );
   }
 }

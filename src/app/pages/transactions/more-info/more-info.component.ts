@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
 import { TransactionsService } from 'src/app/services/transactions.service';
+import { Category } from 'src/app/types/category';
+import { Transaction } from 'src/app/types/transaction';
 
 @Component({
   selector: 'app-more-info',
@@ -22,4 +24,8 @@ export class MoreInfoComponent {
       transactions?.find((t) => t.transaction_id === paramMap.get('id'))
     )
   );
+
+  onSelectedCategoryChange(category: Category, transaction: Transaction) {
+    this.transactionsService.updateCategory(transaction, category);
+  }
 }
