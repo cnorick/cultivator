@@ -19,9 +19,9 @@ export interface Settings {
 export class SettingsService {
   private static readonly SETTINGS_STORAGE_KEY = 'settings';
 
-  private readonly defaults: Settings = {
-    spreadsheetUrl: undefined,
-    dateFormat: undefined,
+  private readonly defaults: Required<Settings> = {
+    spreadsheetUrl: undefined!,
+    dateFormat: undefined!,
     initialTransactionsLoaded: 20,
   };
 

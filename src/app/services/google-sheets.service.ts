@@ -7,11 +7,15 @@ import {
   withLatestFrom,
   shareReplay,
   Subject,
+  startWith,
 } from 'rxjs';
 import { GoogleSheetsClientService } from './google-sheets-client.service';
 import { convertTableToDictArray, normalizeHeader } from '../utils/table-utils';
 import { SettingsService } from './settings.service';
 import { GoogleAuthService } from './google-auth.service';
+import { refreshMap } from '../utils/refresh-operator';
+
+const REFRESH_RATE = 60_000;
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +25,8 @@ export class GoogleSheetsService {
     row: number;
     transaction: any;
   }>();
+
+  private triggerRefresh$ = new Subject<void>();
 
   private readonly spreadsheetId$ = this.settings.spreadsheetUrl$.pipe(
     map((url) => this.googleClient.getSpreadsheetIdFromUrl(url))
@@ -66,11 +72,14 @@ export class GoogleSheetsService {
     shareReplay()
   );
 
-  private readonly transactionValuesRes$ = this.transactionSheetTitle$.pipe(
+  private readonly transactionValuesRes$ = combineLatest([
+    this.transactionSheetTitle$,
+    this.triggerRefresh$.pipe(startWith('')),
+  ]).pipe(
     withLatestFrom(this.spreadsheetId$),
-    switchMap(([title, id]) =>
-      this.googleClient.getSpreadsheetValues(id!, title)
-    ),
+    refreshMap(([[title, _], id]) => {
+      return this.googleClient.getSpreadsheetValues(id!, title);
+    }, REFRESH_RATE),
     shareReplay()
   );
 
@@ -135,8 +144,11 @@ export class GoogleSheetsService {
     this.categorySheetInfo$.subscribe((res) => console.log(res));
     this.categoryValuesRes$.subscribe((res) => console.log(res));
     this.categoryData$.subscribe((res) => console.log(res));
-    // TODO: refresh transactions when this fires?
     this.doUpdateTransaction$.subscribe((res) => console.log(res));
+
+    this.doUpdateTransaction$.subscribe(() => {
+      this.triggerRefresh$.next();
+    });
   }
 
   public updateTransactionsRow(row: number, transaction: any) {
