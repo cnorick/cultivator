@@ -30,7 +30,6 @@ export class SettingsComponent implements OnDestroy {
 
     this.settingsForm.valueChanges
       .pipe(takeUntil(this.destroy$))
-
       .subscribe((settings) => settingsService.updateSettings(settings as any));
   }
 

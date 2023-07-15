@@ -11,20 +11,12 @@ import { SettingsService } from 'src/app/services/settings.service';
 export class GoogleAuthComponent {
   constructor(
     private googleAuthService: GoogleAuthService,
-    private settings: SettingsService,
-    private foo: GoogleSheetsService
+    private settings: SettingsService
   ) {}
 
   public handleAuthClick() {
     (window.location as any) = this.googleAuthService.createAuthUrl({
       route: '/',
-    });
-  }
-
-  public handleFetchClick() {
-    // TODO: make this dynamic
-    this.settings.updateSettings({
-      spreadsheetUrl: '',
     });
   }
 }
