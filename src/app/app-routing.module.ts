@@ -20,8 +20,9 @@ const routes: Routes = [
   },
   {
     path: 'settings',
-    component: SettingsComponent,
-
+    loadChildren: () =>
+      import('./pages/settings/settings.module').then((m) => m.SettingsModule),
+    canActivate: [authGuard],
     data: {
       breadcrumb: 'Settings',
     },

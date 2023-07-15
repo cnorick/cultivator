@@ -25,14 +25,15 @@ export class SettingsService {
     initialTransactionsLoaded: 20,
   };
 
-  private readonly settings$ = new BehaviorSubject<Settings>({});
+  private readonly _settings$ = new BehaviorSubject<Settings>({});
+  public readonly settings$ = this._settings$.asObservable();
 
-  public readonly spreadsheetUrl$ = this.settings$.pipe(
+  public readonly spreadsheetUrl$ = this._settings$.pipe(
     map((settings) => settings.spreadsheetUrl),
     distinctUntilChanged()
   );
 
-  public readonly initialTransactionsLoaded$ = this.settings$.pipe(
+  public readonly initialTransactionsLoaded$ = this._settings$.pipe(
     map(
       (settings) =>
         settings.initialTransactionsLoaded ??
@@ -48,18 +49,17 @@ export class SettingsService {
 
     const settings = { ...this.defaults, ...storedSettings };
 
-    this.settings$.next(settings);
+    this._settings$.next(settings);
 
-    combineLatest({ spreadsheetUrl: this.spreadsheetUrl$ }).subscribe(
-      (settings: Settings) =>
-        localStorage.setItem(
-          SettingsService.SETTINGS_STORAGE_KEY,
-          JSON.stringify(settings)
-        )
+    this.settings$.subscribe((settings: Settings) =>
+      localStorage.setItem(
+        SettingsService.SETTINGS_STORAGE_KEY,
+        JSON.stringify(settings)
+      )
     );
   }
 
   public updateSettings(newSettings: Settings) {
-    this.settings$.next(newSettings);
+    this._settings$.next(newSettings);
   }
 }
