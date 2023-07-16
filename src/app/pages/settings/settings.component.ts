@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, takeUntil, withLatestFrom } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { SettingsService } from 'src/app/services/settings.service';
 
 @Component({
@@ -38,18 +38,15 @@ export class SettingsComponent implements OnDestroy {
       .subscribe((settings) => settingsService.updateSettings(settings as any));
 
     activatedRoute.queryParamMap
-      .pipe(withLatestFrom(settingsService.settings$), takeUntil(this.destroy$))
-      .subscribe(([params, settings]) => {
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
         const docId = params.get('docId');
         if (docId) {
-          settingsService.updateSettings({
-            ...settings,
-            spreadsheetId: docId,
-          });
+          this.settingsForm.patchValue({ spreadsheetId: docId });
         }
         router.navigate([], {
           relativeTo: activatedRoute,
-          queryParams: { docId: null },
+          queryParams: { docId: undefined },
           queryParamsHandling: 'merge',
         });
       });
