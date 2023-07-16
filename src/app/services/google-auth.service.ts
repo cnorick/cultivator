@@ -89,7 +89,7 @@ export class GoogleAuthService {
     const CLIENT_ID = environment.GoogleClient.ClientId;
 
     const CALLBACK_URL = `${window.location.protocol}//${window.location.host}/oauth2callback`;
-    const PROMPT = 'none';
+    const PROMPT = '';
 
     return `https://accounts.google.com/o/oauth2/v2/auth?scope=${scopes.join(
       ' '
