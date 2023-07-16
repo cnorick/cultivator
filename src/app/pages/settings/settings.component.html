@@ -1,7 +1,10 @@
 <form [formGroup]="settingsForm">
   <mat-form-field>
-    <mat-label>Google Sheet Url</mat-label>
-    <input matInput type="url" formControlName="spreadsheetUrl" />
+    <mat-label>Google Sheet ID</mat-label>
+    <input matInput type="url" readonly [disabled]="true" formControlName="spreadsheetId" />
+    <a href="/google-picker.html" matSuffix mat-icon-button aria-label="">
+      <mat-icon>open_in_new</mat-icon>
+    </a>
   </mat-form-field>
   <mat-form-field>
     <mat-label>Transactions Per Page</mat-label>

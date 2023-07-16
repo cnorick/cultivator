@@ -1,14 +1,9 @@
 import { Injectable } from '@angular/core';
-import {
-  BehaviorSubject,
-  combineLatest,
-  distinctUntilChanged,
-  map,
-} from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, map } from 'rxjs';
 import { LocalStorageService } from './local-storage.service';
 
 export interface Settings {
-  spreadsheetUrl?: string;
+  spreadsheetId?: string;
   dateFormat?: string;
   initialTransactionsLoaded?: number;
 }
@@ -20,7 +15,7 @@ export class SettingsService {
   private static readonly SETTINGS_STORAGE_KEY = 'settings';
 
   private readonly defaults: Required<Settings> = {
-    spreadsheetUrl: undefined!,
+    spreadsheetId: undefined!,
     dateFormat: undefined!,
     initialTransactionsLoaded: 20,
   };
@@ -28,8 +23,8 @@ export class SettingsService {
   private readonly _settings$ = new BehaviorSubject<Settings>({});
   public readonly settings$ = this._settings$.asObservable();
 
-  public readonly spreadsheetUrl$ = this._settings$.pipe(
-    map((settings) => settings.spreadsheetUrl),
+  public readonly spreadsheetId$ = this._settings$.pipe(
+    map((settings) => settings.spreadsheetId),
     distinctUntilChanged()
   );
 

@@ -1,6 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Subject, takeUntil } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, takeUntil, withLatestFrom } from 'rxjs';
 import { SettingsService } from 'src/app/services/settings.service';
 
 @Component({
@@ -12,17 +13,21 @@ export class SettingsComponent implements OnDestroy {
   private destroy$ = new Subject<void>();
 
   settingsForm = new FormGroup({
-    spreadsheetUrl: new FormControl(''),
+    spreadsheetId: new FormControl(''),
     dateFormat: new FormControl(''),
     initialTransactionsLoaded: new FormControl<number>(0),
   });
 
-  constructor(settingsService: SettingsService) {
+  constructor(
+    settingsService: SettingsService,
+    activatedRoute: ActivatedRoute,
+    router: Router
+  ) {
     settingsService.settings$
       .pipe(takeUntil(this.settingsForm.valueChanges))
       .subscribe((settings) =>
         this.settingsForm.setValue({
-          spreadsheetUrl: settings.spreadsheetUrl ?? '',
+          spreadsheetId: settings.spreadsheetId ?? '',
           dateFormat: settings.dateFormat ?? '',
           initialTransactionsLoaded: settings.initialTransactionsLoaded ?? 0,
         })
@@ -31,6 +36,23 @@ export class SettingsComponent implements OnDestroy {
     this.settingsForm.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe((settings) => settingsService.updateSettings(settings as any));
+
+    activatedRoute.queryParamMap
+      .pipe(withLatestFrom(settingsService.settings$), takeUntil(this.destroy$))
+      .subscribe(([params, settings]) => {
+        const docId = params.get('docId');
+        if (docId) {
+          settingsService.updateSettings({
+            ...settings,
+            spreadsheetId: docId,
+          });
+        }
+        router.navigate([], {
+          relativeTo: activatedRoute,
+          queryParams: { docId: null },
+          queryParamsHandling: 'merge',
+        });
+      });
   }
 
   ngOnDestroy(): void {

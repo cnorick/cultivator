@@ -82,16 +82,20 @@ export class GoogleAuthService {
   }
 
   public createAuthUrl(state?: AuthState) {
-    const scopes = ['https://www.googleapis.com/auth/drive.file'];
+    const scopes = [
+      'https://www.googleapis.com/auth/drive.file',
+      'https://www.googleapis.com/auth/drive.metadata.readonly',
+    ];
     const CLIENT_ID = environment.GoogleClient.ClientId;
 
     const CALLBACK_URL = `${window.location.protocol}//${window.location.host}/oauth2callback`;
+    const PROMPT = 'none';
 
     return `https://accounts.google.com/o/oauth2/v2/auth?scope=${scopes.join(
       ' '
     )}&include_granted_scopes=true&response_type=token&state=${JSON.stringify(
       state
-    )}&redirect_uri=${CALLBACK_URL}&client_id=${CLIENT_ID}`;
+    )}&redirect_uri=${CALLBACK_URL}&client_id=${CLIENT_ID}&prompt=${PROMPT}`;
   }
 
   public clearToken() {

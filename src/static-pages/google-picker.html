@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Pick Your Tiller Spreadsheet</title>
+  <meta charset="utf-8" />
+</head>
+
+<body>
+  <p>Pick Your Tiller Spreadsheet</p>
+
+  <!--Add buttons to initiate auth sequence and sign out-->
+  <pre id="content" style="white-space: pre-wrap;"></pre>
+
+  <script type="text/javascript">
+    /* exported gapiLoaded */
+    /* exported gisLoaded */
+    /* exported handleAuthClick */
+    /* exported handleSignoutClick */
+
+    // Authorization scopes required by the API; multiple scopes can be
+    // included, separated by spaces.
+    // const SCOPES = 'https://www.googleapis.com/auth/drive.metadata.readonly';
+
+    // TODO(developer): Set to client ID and API key from the Developer Console
+    // const CLIENT_ID = '';
+    // const API_KEY = '';
+
+    // TODO(developer): Replace with your own project number from console.developers.google.com.
+    // const APP_ID = '';
+
+    let accessToken = null;
+    let pickerInited = false;
+    let gisInited = false;
+
+    function gisLoaded() {
+      gisInited = true;
+    }
+    /**
+     * Callback after api.js is loaded.
+     */
+    async function gapiLoaded() {
+      const tokenString = window.localStorage.getItem('google_access_token');
+      const storedToken = JSON.parse(tokenString);
+      storedToken.expirationTime = new Date(storedToken.expirationTime);
+      accessToken = storedToken.accessToken;
+      if (storedToken && Date.now() >= storedToken.expirationTime.getTime()) {
+        throw new Error('Token expired');
+      }
+
+      await gapi.load('client:picker', initializePicker);
+    }
+
+    /**
+     * Callback after the API client is loaded. Loads the
+     * discovery doc to initialize the API.
+     */
+    async function initializePicker() {
+      await gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest');
+      pickerInited = true;
+      createPicker();
+    }
+
+    /**
+     *  Create and render a Picker object for searching images.
+     */
+    function createPicker() {
+      const view = new google.picker.View(google.picker.ViewId.SPREADSHEETS);
+      const picker = new google.picker.PickerBuilder()
+        .enableFeature(google.picker.Feature.NAV_HIDDEN)
+        // .setDeveloperKey(API_KEY)
+        // .setAppId(APP_ID)
+        .setOAuthToken(accessToken)
+        .addView(view)
+        .setCallback(pickerCallback)
+        .build();
+      picker.setVisible(true);
+    }
+
+    /**
+     * Displays the file details of the user's selection.
+     * @param {object} data - Containers the user selection from the picker
+     */
+    async function pickerCallback(data) {
+      if (data.action === google.picker.Action.PICKED) {
+        let text = `Picker response: \n${JSON.stringify(data, null, 2)}\n`;
+        const document = data[google.picker.Response.DOCUMENTS][0];
+        const fileId = document[google.picker.Document.ID];
+        console.log(fileId);
+        window.location.replace(`/settings?docId=${fileId}`);
+      }
+    }
+  </script>
+  <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+  <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+</body>
+
+</html>

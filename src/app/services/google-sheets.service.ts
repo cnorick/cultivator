@@ -28,9 +28,7 @@ export class GoogleSheetsService {
 
   private triggerRefresh$ = new Subject<void>();
 
-  private readonly spreadsheetId$ = this.settings.spreadsheetUrl$.pipe(
-    map((url) => this.googleClient.getSpreadsheetIdFromUrl(url))
-  );
+  private readonly spreadsheetId$ = this.settings.spreadsheetId$;
 
   private readonly allSheetsResponse$ = combineLatest([
     this.spreadsheetId$,
