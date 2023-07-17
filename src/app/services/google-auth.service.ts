@@ -3,6 +3,7 @@ import { BehaviorSubject, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthState } from '../types/auth-state';
 import { LocalStorageService } from './local-storage.service';
+import { LogService } from './log.service';
 
 export interface GoogleToken {
   accessToken: string;
@@ -42,7 +43,10 @@ export class GoogleAuthService {
     )
   );
 
-  constructor(private localStorage: LocalStorageService) {
+  constructor(
+    private localStorage: LocalStorageService,
+    private logger: LogService
+  ) {
     const tokenString = this.localStorage.getItem(
       GoogleAuthService.STORAGE_KEY
     );
@@ -58,6 +62,8 @@ export class GoogleAuthService {
 
   public setToken(newToken: GoogleToken) {
     if (!newToken.accessToken || typeof newToken.accessToken != 'string') {
+      this.logger.error('Access token is not defined');
+      this.logger.error(newToken);
       throw new Error('Access token is not defined');
     }
 
@@ -66,6 +72,8 @@ export class GoogleAuthService {
       typeof newToken.expiresIn != 'number' ||
       Number.isNaN(newToken.expiresIn)
     ) {
+      this.logger.error('ExpiresIn is not defined');
+      this.logger.error(newToken);
       throw new Error('ExpiresIn is not defined');
     }
 

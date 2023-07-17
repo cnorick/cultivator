@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { GoogleAuthService } from './google-auth.service';
+import { LogService } from './log.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +13,11 @@ export class GoogleSheetsClientService {
 
   private accessToken: string | undefined;
 
-  constructor(private auth: GoogleAuthService, private http: HttpClient) {
+  constructor(
+    private auth: GoogleAuthService,
+    private http: HttpClient,
+    private logger: LogService
+  ) {
     this.auth.accessToken$.subscribe(
       (accessToken) => (this.accessToken = accessToken)
     );
@@ -20,12 +25,19 @@ export class GoogleSheetsClientService {
 
   private get<T>(url: string) {
     if (!this.accessToken) {
+      this.logger.error('Not logged into Google. Access Token is not defined');
       throw new Error('Not logged into Google.');
     }
 
-    return this.http.get<T>(url, {
-      headers: { Authorization: `Bearer ${this.accessToken}` },
-    });
+    try {
+      return this.http.get<T>(url, {
+        headers: { Authorization: `Bearer ${this.accessToken}` },
+      });
+    } catch (error) {
+      this.logger.log(`Error making get request to ${url}`);
+      this.logger.log(error);
+      throw error;
+    }
   }
 
   private put<T>(url: string, body: any) {
@@ -33,9 +45,15 @@ export class GoogleSheetsClientService {
       throw new Error('Not logged into Google.');
     }
 
-    return this.http.put<T>(url, body, {
-      headers: { Authorization: `Bearer ${this.accessToken}` },
-    });
+    try {
+      return this.http.put<T>(url, body, {
+        headers: { Authorization: `Bearer ${this.accessToken}` },
+      });
+    } catch (error) {
+      this.logger.log(`Error making put request to ${url}`);
+      this.logger.log(error);
+      throw error;
+    }
   }
 
   public getAllSheets(spreadsheetId: string) {

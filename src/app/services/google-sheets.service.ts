@@ -14,6 +14,7 @@ import { convertTableToDictArray, normalizeHeader } from '../utils/table-utils';
 import { SettingsService } from './settings.service';
 import { GoogleAuthService } from './google-auth.service';
 import { refreshMap } from '../utils/refresh-operator';
+import { LogService } from './log.service';
 
 const REFRESH_RATE = 60_000;
 
@@ -133,16 +134,17 @@ export class GoogleSheetsService {
   constructor(
     private googleClient: GoogleSheetsClientService,
     private settings: SettingsService,
-    private auth: GoogleAuthService
+    private auth: GoogleAuthService,
+    logger: LogService
   ) {
-    this.allSheetsResponse$.subscribe((res) => console.log(res));
-    this.transactionsSheetInfo$.subscribe((res) => console.log(res));
-    this.transactionValuesRes$.subscribe((res) => console.log(res));
-    this.transactionData$.subscribe((res) => console.log(res));
-    this.categorySheetInfo$.subscribe((res) => console.log(res));
-    this.categoryValuesRes$.subscribe((res) => console.log(res));
-    this.categoryData$.subscribe((res) => console.log(res));
-    this.doUpdateTransaction$.subscribe((res) => console.log(res));
+    this.allSheetsResponse$.subscribe((res) => logger.log(res));
+    this.transactionsSheetInfo$.subscribe((res) => logger.log(res));
+    this.transactionValuesRes$.subscribe((res) => logger.log(res));
+    this.transactionData$.subscribe((res) => logger.log(res));
+    this.categorySheetInfo$.subscribe((res) => logger.log(res));
+    this.categoryValuesRes$.subscribe((res) => logger.log(res));
+    this.categoryData$.subscribe((res) => logger.log(res));
+    this.doUpdateTransaction$.subscribe((res) => logger.log(res));
 
     this.doUpdateTransaction$.subscribe(() => {
       this.triggerRefresh$.next();

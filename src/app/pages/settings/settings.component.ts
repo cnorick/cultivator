@@ -2,6 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
+import { LogService } from 'src/app/services/log.service';
 import { SettingsService } from 'src/app/services/settings.service';
 
 @Component({
@@ -13,7 +14,7 @@ export class SettingsComponent implements OnDestroy {
   private destroy$ = new Subject<void>();
 
   settingsForm = new FormGroup({
-    spreadsheetId: new FormControl(''),
+    spreadsheetId: new FormControl({ value: '', disabled: true }),
     dateFormat: new FormControl(''),
     initialTransactionsLoaded: new FormControl<number>(0),
   });
@@ -21,7 +22,8 @@ export class SettingsComponent implements OnDestroy {
   constructor(
     settingsService: SettingsService,
     activatedRoute: ActivatedRoute,
-    router: Router
+    router: Router,
+    private logger: LogService
   ) {
     settingsService.settings$
       .pipe(takeUntil(this.settingsForm.valueChanges))
@@ -50,6 +52,10 @@ export class SettingsComponent implements OnDestroy {
           queryParamsHandling: 'merge',
         });
       });
+  }
+
+  onDownloadLogsClick() {
+    this.logger.downloadLogs();
   }
 
   ngOnDestroy(): void {

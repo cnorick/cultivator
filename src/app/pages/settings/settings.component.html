@@ -1,7 +1,7 @@
 <form [formGroup]="settingsForm">
   <mat-form-field>
     <mat-label>Google Sheet ID</mat-label>
-    <input matInput type="url" readonly [disabled]="true" formControlName="spreadsheetId" />
+    <input matInput type="url" readonly formControlName="spreadsheetId" />
     <a href="/google-picker.html" matSuffix mat-icon-button aria-label="">
       <mat-icon>open_in_new</mat-icon>
     </a>
@@ -10,4 +10,5 @@
     <mat-label>Transactions Per Page</mat-label>
     <input matInput type="number" formControlName="initialTransactionsLoaded" />
   </mat-form-field>
+  <button mat-button (click)="onDownloadLogsClick()">Download Logs</button>
 </form>
