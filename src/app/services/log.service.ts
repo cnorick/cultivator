@@ -26,7 +26,7 @@ export class LogService {
   }
 
   public log(message: any) {
-    this.saveLog(message, LogLevel.DEBUG);
+    // this.saveLog(message, LogLevel.DEBUG);
     console.log(message);
   }
 

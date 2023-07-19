@@ -14,7 +14,7 @@ export class SettingsComponent implements OnDestroy {
   private destroy$ = new Subject<void>();
 
   settingsForm = new FormGroup({
-    spreadsheetId: new FormControl({ value: '', disabled: true }),
+    spreadsheetId: new FormControl({ value: '', disabled: false }),
     dateFormat: new FormControl(''),
     initialTransactionsLoaded: new FormControl<number>(0),
   });
