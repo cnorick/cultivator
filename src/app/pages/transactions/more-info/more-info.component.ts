@@ -18,7 +18,7 @@ export class MoreInfoComponent {
 
   transaction$ = combineLatest([
     this.activatedRoute.paramMap,
-    this.transactionsService.shownTransactions$,
+    this.transactionsService.transactions$,
   ]).pipe(
     map(([paramMap, transactions]) =>
       transactions?.find((t) => t.transaction_id === paramMap.get('id'))
@@ -27,5 +27,10 @@ export class MoreInfoComponent {
 
   onSelectedCategoryChange(category: Category, transaction: Transaction) {
     this.transactionsService.updateCategory(transaction, category);
+  }
+
+  onNotesChange(event: Event, transaction: Transaction) {
+    const notes = (event.target as any).value;
+    this.transactionsService.updateNotes(transaction, notes);
   }
 }

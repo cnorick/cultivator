@@ -68,4 +68,10 @@ export class TransactionsService {
 
     this.googleSheets.updateTransactionsRow(transaction.sheetsRow, dataDict);
   }
+
+  public updateNotes(transaction: Transaction, notes: string) {
+    const dataDict = { ...transaction.original, notes };
+
+    this.googleSheets.updateTransactionsRow(transaction.sheetsRow, dataDict);
+  }
 }
