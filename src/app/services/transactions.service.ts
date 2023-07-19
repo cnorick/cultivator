@@ -53,6 +53,7 @@ export class TransactionsService {
       filters
         .reduce((acc, filter) => acc.filter(filter), transactions)
         .slice(0, limit)
+        .sort((t1, t2) => (t2.date?.getTime() ?? 0) - (t1.date?.getTime() ?? 0))
     ),
     startWith(null),
     shareReplay()
