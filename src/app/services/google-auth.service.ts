@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map } from 'rxjs';
+import { BehaviorSubject, map, skip } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthState } from '../types/auth-state';
 import { LocalStorageService } from './local-storage.service';
@@ -25,6 +25,8 @@ export class GoogleAuthService {
     undefined
   );
 
+  private timeoutId?: number = undefined;
+
   /**
    * Emits the access token if its valid, undefined otherwise.
    */
@@ -43,10 +45,27 @@ export class GoogleAuthService {
     )
   );
 
+  private _setToken(token?: StoredGoogleToken) {
+    this.token$.next(token);
+    window.clearTimeout(this.timeoutId);
+
+    if (token) {
+      this.timeoutId = window.setTimeout(() => {
+        this._setToken(undefined);
+      }, token.expirationTime.getTime() - Date.now() - 10_000); // Trigger re-auth 10 seconds before the token expires
+    }
+  }
+
   constructor(
     private localStorage: LocalStorageService,
     private logger: LogService
   ) {
+    this.token$.pipe(skip(1)).subscribe((token) => {
+      if (!token) {
+        this.reauthenticate();
+      }
+    });
+
     const tokenString = this.localStorage.getItem(
       GoogleAuthService.STORAGE_KEY
     );
@@ -56,7 +75,7 @@ export class GoogleAuthService {
       storedToken.expirationTime = new Date(
         storedToken.expirationTime as unknown as string
       );
-      this.token$.next(storedToken);
+      this._setToken(storedToken);
     }
   }
 
@@ -86,7 +105,7 @@ export class GoogleAuthService {
       JSON.stringify(storedToken)
     );
 
-    this.token$.next(storedToken);
+    this._setToken(storedToken);
   }
 
   public createAuthUrl(state?: AuthState) {
@@ -109,5 +128,13 @@ export class GoogleAuthService {
   public clearToken() {
     this.token$.next(undefined);
     this.localStorage.removeItem(GoogleAuthService.STORAGE_KEY);
+  }
+
+  public reauthenticate(state?: AuthState) {
+    const defaultState: AuthState = {
+      route: location.pathname + location.search,
+    };
+    const calculatedState = { ...state, ...defaultState };
+    (window.location as any) = this.createAuthUrl(calculatedState);
   }
 }
