@@ -11,6 +11,7 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { combineLatest, map, startWith, Subject, takeUntil } from 'rxjs';
 import { CategoryService } from 'src/app/services/category.service';
 import { Category } from 'src/app/types/category';
+import FuzzySearch from 'fuzzy-search';
 
 @Component({
   selector: 'app-category-selector',
@@ -57,14 +58,15 @@ export class CategorySelectorComponent implements OnInit, OnDestroy {
   );
 
   private filterCategories(categories: Category[], value: string): Category[] {
-    const filterTokens = value.toLowerCase().split(/\W/).filter(Boolean);
-    return categories.filter((c) =>
-      filterTokens.every(
-        (token) =>
-          c.category?.toLowerCase().includes(token) ||
-          c.group?.toLowerCase().includes(token)
-      )
-    );
+    if (value.toLowerCase() === 'none') {
+      return categories;
+    }
+
+    const searcher = new FuzzySearch(categories, ['group', 'category'], {
+      caseSensitive: false,
+    });
+
+    return searcher.search(value);
   }
 
   onCategoryChange(event: MatAutocompleteSelectedEvent) {
