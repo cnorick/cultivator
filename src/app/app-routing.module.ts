@@ -2,8 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthCallbackComponent } from './components/auth-callback/auth-callback.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
-import { SettingsComponent } from './pages/settings/settings.component';
 import { authGuard } from './guards/auth.guard';
+import { googleSheetIsSetGuard } from './guards/google-sheet-is-set.guard';
 
 const routes: Routes = [
   { path: 'oauth2callback', component: AuthCallbackComponent },
@@ -13,7 +13,7 @@ const routes: Routes = [
       import('./pages/transactions/transactions.module').then(
         (m) => m.TransactionsModule
       ),
-    canActivate: [authGuard],
+    canActivate: [authGuard, googleSheetIsSetGuard],
     data: {
       breadcrumb: 'Transactions',
     },

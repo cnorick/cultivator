@@ -11,6 +11,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { ComponentsModule } from './components/components.module';
+import {
+  MatSnackBarModule,
+  MAT_SNACK_BAR_DEFAULT_OPTIONS,
+} from '@angular/material/snack-bar';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
@@ -25,15 +29,18 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     MatButtonModule,
     MatSidenavModule,
     MatListModule,
+    MatSnackBarModule,
     ComponentsModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
       // Register the ServiceWorker as soon as the application is stable
       // or after 30 seconds (whichever comes first).
-      registrationStrategy: 'registerWhenStable:30000'
+      registrationStrategy: 'registerWhenStable:30000',
     }),
   ],
-  providers: [],
+  providers: [
+    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 5000 } },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
