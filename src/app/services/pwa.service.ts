@@ -11,6 +11,7 @@ import { LocalStorageService } from './local-storage.service';
 export class PwaService {
   private static readonly LAST_PROMPTED_KEY = 'last_prompted_pwa';
   private static readonly PROMPT_REFRACTORY_PERIOD = 7 * 24 * 60 * 60 * 1000; // milliseconds
+  private static readonly PROMPT_INITIAL_DELAY = 60 * 1000; // milliseconds
   private promptEvent: any;
 
   constructor(
@@ -42,7 +43,7 @@ export class PwaService {
       PwaService.LAST_PROMPTED_KEY
     );
 
-    let timeToNextPrompt = 3000; // wait 3 seconds on iphone before prompting.
+    let timeToNextPrompt = PwaService.PROMPT_INITIAL_DELAY;
     if (lastPrompted) {
       const lastPromptedDate = new Date(lastPrompted);
       timeToNextPrompt =

@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { MatChipSelectionChange } from '@angular/material/chips';
+import { ActivatedRoute, Router } from '@angular/router';
+import { take } from 'rxjs';
 import {
   TransactionFilter,
   TransactionsService,
@@ -25,11 +27,28 @@ interface Filter {
   styleUrls: ['./transactions.component.scss'],
 })
 export class TransactionsComponent {
-  constructor(private transactionsService: TransactionsService) {}
+  constructor(
+    private transactionsService: TransactionsService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
+  ) {
+    activatedRoute.queryParamMap.pipe(take(1)).subscribe((queryParams) => {
+      const filterNames = queryParams.get('filters')?.split(',') ?? [];
+      for (let filterName of filterNames) {
+        const filter = this.allFilters.find(
+          (f) => this.convertFilterNameToParam(f.name) === filterName
+        );
+
+        if (filter) {
+          this.toggleFilter(filter, true);
+        }
+      }
+    });
+  }
 
   transactions$ = this.transactionsService.shownTransactions$;
 
-  allFilters: Filter[] = [
+  readonly allFilters: Filter[] = [
     {
       name: 'Uncategorized',
       filter: (t: Transaction) => !t.category,
@@ -68,16 +87,34 @@ export class TransactionsComponent {
     },
   ];
 
+  private convertFilterNameToParam(name: string) {
+    return name.replace(/\s/, '-').toLowerCase();
+  }
+
+  private toggleFilter(filter: Filter, state: boolean) {
+    filter.selected = state;
+    filter.onChange?.(state, this.allFilters);
+
+    const selectedFilters = this.allFilters.filter((f) => f.selected);
+    this.transactionsService.setFilters(selectedFilters.map((f) => f.filter));
+
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams: {
+        filters: selectedFilters
+          .map((f) => this.convertFilterNameToParam(f.name))
+          .join(','),
+      },
+      queryParamsHandling: 'merge', // remove to replace all query params by provided
+      replaceUrl: true,
+    });
+  }
+
   onFilterChange(
     event: MatChipSelectionChange,
     filter: Filter,
     allFilters: Filter[]
   ) {
-    filter.selected = event.selected;
-    filter.onChange?.(event.selected, allFilters);
-
-    this.transactionsService.setFilters(
-      allFilters.filter((f) => f.selected).map((f) => f.filter)
-    );
+    this.toggleFilter(filter, event.selected);
   }
 }
