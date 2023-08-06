@@ -11,9 +11,19 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatDividerModule } from '@angular/material/divider';
+import { CategorySelectorPageComponent } from './more-info/category-selector-page/category-selector-page.component';
+import { MatIconModule } from '@angular/material/icon';
+import { InfoContainerComponent } from './more-info/info-container/info-container.component';
 
 @NgModule({
-  declarations: [TransactionsComponent, MoreInfoComponent],
+  declarations: [
+    TransactionsComponent,
+    MoreInfoComponent,
+    CategorySelectorPageComponent,
+    InfoContainerComponent,
+  ],
   imports: [
     CommonModule,
     TransactionsRoutingModule,
@@ -25,6 +35,9 @@ import { MatInputModule } from '@angular/material/input';
     MatChipsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatListModule,
+    MatDividerModule,
+    MatIconModule,
   ],
 })
 export class TransactionsModule {}

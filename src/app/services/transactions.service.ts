@@ -6,7 +6,7 @@ import {
   shareReplay,
   startWith,
 } from 'rxjs';
-import { Category } from '../types/category';
+import { Category, CATEGORY_LOADING_VAL } from '../types/category';
 import { Transaction } from '../types/transaction';
 import { convertDataDictToTransaction } from '../utils/transaction-converter';
 import { GoogleSheetsService } from './google-sheets.service';
@@ -66,6 +66,7 @@ export class TransactionsService {
   public updateCategory(transaction: Transaction, category: Category) {
     const dataDict = { ...transaction.original, category: category.category };
 
+    transaction.category = CATEGORY_LOADING_VAL;
     this.googleSheets.updateTransactionsRow(transaction.sheetsRow, dataDict);
   }
 

@@ -1,0 +1,59 @@
+<div class="info-container" *ngIf="(transaction$ | async) as t">
+  <mat-list>
+    <mat-list-item>
+      <span class="label" matListItemLine>Merchant</span>
+      <span class="data" matListItemLine>{{t.full_description}}</span>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+    <mat-list-item>
+      <span class="label" matListItemLine>Date</span>
+      <span class="data" matListItemLine>{{t.date | date: 'fullDate'}}</span>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+    <mat-list-item routerLink="./category">
+      <span class="label" matListItemLine>Category</span>
+      <span class="data" matListItemLine>
+        <ng-container *ngIf="t.category !== CATEGORY_LOADING_VAL; else placeholderSpinner">
+          {{t.category || 'uncategorized'}}
+        </ng-container>
+      </span>
+      <span matListItemMeta class="arrow">
+        <mat-icon>chevron_right</mat-icon>
+      </span>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+    <mat-list-item>
+      <span class="label" matListItemLine>Account</span>
+      <span class="data" matListItemLine>{{t.account}}</span>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+    <mat-list-item>
+      <span class="label" matListItemLine>Account #</span>
+      <span class="data" matListItemLine>{{t['account_#']}}</span>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+    <mat-list-item>
+      <span class="label" matListItemLine>Account Id</span>
+      <span class="data" matListItemLine>{{t.account_id}}</span>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+    <mat-list-item>
+      <span class="label" matListItemLine>Check Number</span>
+      <span class="data" matListItemLine>{{t.check_number}}</span>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+    <mat-list-item>
+      <span class="label" matListItemLine>Date Added</span>
+      <span class="data" matListItemLine>{{t.date_added | date: 'fullDate'}}</span>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+    <mat-list-item>
+      <span class="label" matListItemLine>Notes</span>
+      <span class="data" matListItemLine>{{t.notes}}</span>
+    </mat-list-item>
+  </mat-list>
+</div>
+
+<ng-template #placeholderSpinner>
+  <mat-spinner class="list-item-spinner" diameter="30"></mat-spinner>
+</ng-template>

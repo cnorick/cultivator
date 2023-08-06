@@ -3,6 +3,8 @@
     <a class="crumb" [routerLink]="breadcrumb.url" routerLinkActive="router-link-active">
       {{ breadcrumb.label }}
     </a>
-    <span *ngIf="!isLast" class="arrow">></span>
+    <span *ngIf="!isLast" class="arrow">
+      <mat-icon>chevron_right</mat-icon>
+    </span>
   </ng-container>
 </div>

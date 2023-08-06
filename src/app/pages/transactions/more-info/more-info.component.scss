@@ -8,16 +8,18 @@ mat-spinner {
   margin: 0 auto;
 }
 
-.info-container {
+.header-container {
   display: flex;
   flex-direction: column;
-}
+  align-items: center;
+  gap: .5em;
 
-.label {
-  filter: brightness(75%);
-}
+  h2 {
+    margin-top: 0;
+    margin-bottom: 0.5em;
+  }
 
-h2 {
-  margin-top: 0;
-  margin-bottom: 0.2em;
+  .description {
+    text-transform: uppercase;
+  }
 }

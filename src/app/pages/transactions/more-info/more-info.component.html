@@ -1,24 +1,12 @@
 <ng-container *ngIf="transaction$ | async as t else spinner">
-  <h2>{{t.description}}</h2>
-  <div class="info-container">
-    <span><small class="label">Category:</small> {{t.category || 'uncategorized'}}</span>
-    <span><small class="label">Amount:</small> {{t.amount | currency}}</span>
-    <span><small class="label">Date:</small> {{t.date | date}}</span>
-    <span><small class="label">Institution:</small> {{t.institution}}</span>
-    <span><small class="label">Account:</small> {{t.account}}</span>
-    <span><small class="label">Account #:</small> {{t['account_#']}}</span>
-    <span><small class="label">Full Description:</small> {{t.full_description}}</span>
-    <span><small class="label">Account Id:</small> {{t.account_id}}</span>
-    <span><small class="label">Check Number:</small> {{t.check_number}}</span>
-    <span><small class="label">Date Added:</small> {{t.date_added | date}}</span>
-    <app-category-selector (selectedCategoryChange)="onSelectedCategoryChange($event, t)"
-      [selectedCategory]="t.category"></app-category-selector>
-    <mat-form-field>
-      <mat-label>Notes:</mat-label>
-      <input matInput type="textarea" [value]="t.notes" (change)="onNotesChange($event, t)" />
-    </mat-form-field>
+  <div class="header-container">
+    <h2>{{t.amount | currency}}</h2>
+    <b class="description">{{t.description}}</b>
+    <span>{{t.date | date: 'fullDate'}}</span>
+    <span>{{t.institution}}</span>
   </div>
 
+  <router-outlet></router-outlet>
 
 </ng-container>
 <ng-template #spinner>

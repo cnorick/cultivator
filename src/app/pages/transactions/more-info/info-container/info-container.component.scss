@@ -1,0 +1,29 @@
+.info-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: .8em;
+  filter: brightness(75%);
+}
+
+.data {
+  font-size: 1.2em;
+}
+
+mat-list-item .arrow {
+  font-size: 1.5em;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  mat-icon {
+    transform: scale(1.5);
+  }
+}
+
+.list-item-spinner {
+  display: inline-flex;
+}

@@ -19,6 +19,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { PwaService } from './services/pwa.service';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { SWUpdateService } from './services/sw-update.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 const initializer = (pwaService: PwaService) => () =>
   pwaService.initPwaPrompt();
@@ -37,6 +38,7 @@ const initializer = (pwaService: PwaService) => () =>
     MatListModule,
     MatSnackBarModule,
     MatBottomSheetModule,
+    MatProgressSpinnerModule,
     ComponentsModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),

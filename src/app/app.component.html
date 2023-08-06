@@ -13,6 +13,7 @@
     </mat-toolbar>
     <app-breadcrumbs></app-breadcrumbs>
     <div class="outlet">
+      <mat-spinner *ngIf="loading"></mat-spinner>
       <router-outlet></router-outlet>
     </div>
     <app-footer></app-footer>
