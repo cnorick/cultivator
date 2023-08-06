@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
 import { TransactionsService } from 'src/app/services/transactions.service';
-import { Transaction } from 'src/app/types/transaction';
 
 @Component({
   selector: 'app-more-info',
@@ -23,9 +22,4 @@ export class MoreInfoComponent {
       transactions?.find((t) => t.transaction_id === paramMap.get('id'))
     )
   );
-
-  onNotesChange(event: Event, transaction: Transaction) {
-    const notes = (event.target as any).value;
-    this.transactionsService.updateNotes(transaction, notes);
-  }
 }

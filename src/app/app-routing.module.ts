@@ -6,7 +6,11 @@ import { authGuard } from './guards/auth.guard';
 import { googleSheetIsSetGuard } from './guards/google-sheet-is-set.guard';
 
 const routes: Routes = [
-  { path: 'oauth2callback', component: AuthCallbackComponent },
+  {
+    path: 'oauth2callback',
+    component: AuthCallbackComponent,
+    title: 'Oauth Callback',
+  },
   {
     path: 'transactions',
     loadChildren: () =>
@@ -17,6 +21,7 @@ const routes: Routes = [
     data: {
       breadcrumb: 'Transactions',
     },
+    title: 'Transactions',
   },
   {
     path: 'settings',
@@ -26,6 +31,7 @@ const routes: Routes = [
     data: {
       breadcrumb: 'Settings',
     },
+    title: 'Settings',
   },
   {
     path: 'login',
@@ -34,6 +40,7 @@ const routes: Routes = [
     data: {
       breadcrumb: 'Login',
     },
+    title: 'Login',
   },
   { path: '', redirectTo: '/transactions', pathMatch: 'full' },
   { path: '**', component: PageNotFoundComponent },

@@ -16,6 +16,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { CategorySelectorPageComponent } from './more-info/category-selector-page/category-selector-page.component';
 import { MatIconModule } from '@angular/material/icon';
 import { InfoContainerComponent } from './more-info/info-container/info-container.component';
+import { NotesComponent } from './more-info/notes/notes.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { InfoContainerComponent } from './more-info/info-container/info-containe
     MoreInfoComponent,
     CategorySelectorPageComponent,
     InfoContainerComponent,
+    NotesComponent,
   ],
   imports: [
     CommonModule,

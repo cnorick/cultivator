@@ -72,6 +72,7 @@ export class TransactionsService {
 
   public updateNotes(transaction: Transaction, notes: string) {
     const dataDict = { ...transaction.original, notes };
+    transaction.notes = CATEGORY_LOADING_VAL;
 
     this.googleSheets.updateTransactionsRow(transaction.sheetsRow, dataDict);
   }
