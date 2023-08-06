@@ -45,12 +45,12 @@ export class SettingsComponent implements OnDestroy {
         const docId = params.get('docId');
         if (docId) {
           this.settingsForm.patchValue({ spreadsheetId: docId });
+          router.navigate([], {
+            relativeTo: activatedRoute,
+            queryParams: { docId: undefined },
+            queryParamsHandling: 'merge',
+          });
         }
-        router.navigate([], {
-          relativeTo: activatedRoute,
-          queryParams: { docId: undefined },
-          queryParamsHandling: 'merge',
-        });
       });
   }
 
