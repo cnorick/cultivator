@@ -1,18 +1,6 @@
 <mat-drawer-container class="example-container" autosize>
   <mat-drawer #drawer class="example-sidenav" mode="over" position="end">
-    <nav>
-      <mat-list role="list">
-        <mat-list-item role="listitem" *ngIf="!(loggedIn$ | async)" (click)="drawer.toggle()">
-          <a class="nav-link" routerLinkActive="active-link" routerLink="/login">Login</a>
-        </mat-list-item>
-        <mat-list-item role="listitem" (click)="drawer.toggle()">
-          <a class="nav-link" routerLink="/transactions" routerLinkActive="active-link">Transactions</a>
-        </mat-list-item>
-        <mat-list-item role="listitem" (click)="drawer.toggle()">
-          <a class="nav-link" routerLink="/settings" routerLinkActive="active-link">Settings</a>
-        </mat-list-item>
-      </mat-list>
-    </nav>
+    <app-nav [loggedIn]="!!(loggedIn$ | async)" (linkClick)="drawer.toggle()"></app-nav>
   </mat-drawer>
 
   <div class="page">

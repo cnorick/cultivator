@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @use "@angular/material" as mat;
-@use "./app/components/transaction/transaction-theme.component" as transaction;
+@use "./app/components/transaction/transaction.component-theme" as transaction;
+@use "./app/components/breadcrumbs/breadcrumbs.component-theme" as breadcrumbs;
 
 @import "@angular/material/theming";
 @include mat.core();
@@ -8,20 +9,39 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
-$angular-primary: mat.define-palette(mat.$teal-palette, 500, 100, 900);
-$angular-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$primary: mat.define-palette(mat.$teal-palette, 500, 100, 900);
+$accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$warn: mat.define-palette(mat.$red-palette);
 
-$angular-warn: mat.define-palette(mat.$red-palette);
-
-$angular-default-theme: mat.define-light-theme(
+$dark-theme: mat.define-dark-theme(
   (
     color: (
-      primary: $angular-primary,
-      accent: $angular-accent,
-      warn: $angular-warn,
+      primary: $primary,
+      accent: $accent,
+      warn: $warn,
     ),
+    typography: mat.define-typography-config(),
   )
 );
 
-@include mat.all-component-themes($angular-default-theme);
-@include transaction.theme($angular-default-theme);
+$light-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $primary,
+      accent: $accent,
+      warn: $warn,
+    ),
+    typography: mat.define-typography-config(),
+  )
+);
+
+@include mat.all-component-themes($dark-theme);
+@include transaction.theme($dark-theme);
+@include breadcrumbs.theme($dark-theme);
+
+// Apply the light theme only when the user prefers light themes.
+@media (prefers-color-scheme: light) {
+  @include mat.all-component-themes($light-theme);
+  @include transaction.theme($light-theme);
+  @include breadcrumbs.theme($light-theme);
+}

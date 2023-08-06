@@ -1,14 +1,9 @@
 .breadcrumb {
-    background: none;
     font-size: .8em;
     padding: 1em;
     display: flex;
     flex-direction: row;
-    a, span {
-        color: darkgrey;
-    }
     a:hover, span:hover {
-        color: dimgrey;
         text-decoration: none;
     }
     .crumb{

@@ -14,5 +14,10 @@ mat-spinner {
 }
 
 .label {
-  color: gray;
+  filter: brightness(75%);
+}
+
+h2 {
+  margin-top: 0;
+  margin-bottom: 0.2em;
 }

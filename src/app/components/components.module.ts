@@ -13,6 +13,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TransactionComponent } from './transaction/transaction.component';
 import { MatCardModule } from '@angular/material/card';
+import { NavComponent } from './nav/nav.component';
+import { MatListModule } from '@angular/material/list';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -22,6 +25,7 @@ import { MatCardModule } from '@angular/material/card';
     BreadcrumbsComponent,
     CategorySelectorComponent,
     TransactionComponent,
+    NavComponent,
   ],
   imports: [
     CommonModule,
@@ -31,6 +35,8 @@ import { MatCardModule } from '@angular/material/card';
     MatInputModule,
     MatDividerModule,
     MatCardModule,
+    MatListModule,
+    MatButtonModule,
     FormsModule,
     ReactiveFormsModule,
   ],
@@ -41,6 +47,7 @@ import { MatCardModule } from '@angular/material/card';
     BreadcrumbsComponent,
     CategorySelectorComponent,
     TransactionComponent,
+    NavComponent,
   ],
 })
 export class ComponentsModule {}
