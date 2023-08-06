@@ -2,8 +2,10 @@ import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SwUpdate } from '@angular/service-worker';
 
-@Injectable()
-export class LogUpdateService {
+@Injectable({
+  providedIn: 'root',
+})
+export class SWUpdateService {
   private askUserToUpdate() {
     this.snackbar
       .open('A new version of the app is available', 'Update Now', {

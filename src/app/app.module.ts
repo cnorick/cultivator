@@ -18,6 +18,7 @@ import {
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { PwaService } from './services/pwa.service';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
+import { SWUpdateService } from './services/sw-update.service';
 
 const initializer = (pwaService: PwaService) => () =>
   pwaService.initPwaPrompt();
@@ -49,7 +50,7 @@ const initializer = (pwaService: PwaService) => () =>
     {
       provide: APP_INITIALIZER,
       useFactory: initializer,
-      deps: [PwaService],
+      deps: [PwaService, SWUpdateService],
       multi: true,
     },
   ],
