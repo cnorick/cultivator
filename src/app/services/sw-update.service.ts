@@ -9,7 +9,7 @@ export class SWUpdateService {
   private askUserToUpdate() {
     this.snackbar
       .open('A new version of the app is available', 'Update Now', {
-        duration: 10_000,
+        duration: 30_000,
       })
       .onAction()
       .subscribe(() => document.location.reload());
