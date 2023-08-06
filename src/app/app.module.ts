@@ -1,4 +1,4 @@
-import { NgModule, isDevMode } from '@angular/core';
+import { NgModule, isDevMode, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 
@@ -16,6 +16,11 @@ import {
   MAT_SNACK_BAR_DEFAULT_OPTIONS,
 } from '@angular/material/snack-bar';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { PwaService } from './services/pwa.service';
+import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
+
+const initializer = (pwaService: PwaService) => () =>
+  pwaService.initPwaPrompt();
 
 @NgModule({
   declarations: [AppComponent],
@@ -30,6 +35,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     MatSidenavModule,
     MatListModule,
     MatSnackBarModule,
+    MatBottomSheetModule,
     ComponentsModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
@@ -40,6 +46,12 @@ import { ServiceWorkerModule } from '@angular/service-worker';
   ],
   providers: [
     { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 5000 } },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializer,
+      deps: [PwaService],
+      multi: true,
+    },
   ],
   bootstrap: [AppComponent],
 })

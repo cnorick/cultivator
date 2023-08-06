@@ -16,6 +16,9 @@ import { MatCardModule } from '@angular/material/card';
 import { NavComponent } from './nav/nav.component';
 import { MatListModule } from '@angular/material/list';
 import { MatButtonModule } from '@angular/material/button';
+import { PromptComponent } from './prompt/prompt.component';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -26,6 +29,7 @@ import { MatButtonModule } from '@angular/material/button';
     CategorySelectorComponent,
     TransactionComponent,
     NavComponent,
+    PromptComponent,
   ],
   imports: [
     CommonModule,
@@ -37,6 +41,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatCardModule,
     MatListModule,
     MatButtonModule,
+    MatToolbarModule,
+    MatIconModule,
     FormsModule,
     ReactiveFormsModule,
   ],
