@@ -1,7 +1,13 @@
 :host {
-  margin: 1em;
+  margin: 0 1em;
   display: flex;
   flex-direction: column;
+}
+
+mat-toolbar {
+  margin-bottom: 1em;
+  height: auto;
+  padding: 0.5em;
 }
 
 mat-spinner {
