@@ -19,6 +19,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { PromptComponent } from './prompt/prompt.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
+import { FooterComponent } from './footer/footer.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { MatIconModule } from '@angular/material/icon';
     TransactionComponent,
     NavComponent,
     PromptComponent,
+    FooterComponent,
   ],
   imports: [
     CommonModule,
@@ -54,6 +56,7 @@ import { MatIconModule } from '@angular/material/icon';
     CategorySelectorComponent,
     TransactionComponent,
     NavComponent,
+    FooterComponent,
   ],
 })
 export class ComponentsModule {}

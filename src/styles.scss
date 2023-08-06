@@ -2,6 +2,7 @@
 @use "@angular/material" as mat;
 @use "./app/components/transaction/transaction.component-theme" as transaction;
 @use "./app/components/breadcrumbs/breadcrumbs.component-theme" as breadcrumbs;
+@use "./app/components/footer//footer.component-theme" as footer;
 
 @import "@angular/material/theming";
 @include mat.core();
@@ -38,10 +39,12 @@ $light-theme: mat.define-light-theme(
 @include mat.all-component-themes($dark-theme);
 @include transaction.theme($dark-theme);
 @include breadcrumbs.theme($dark-theme);
+@include footer.theme($dark-theme);
 
 // Apply the light theme only when the user prefers light themes.
 @media (prefers-color-scheme: light) {
   @include mat.all-component-themes($light-theme);
   @include transaction.theme($light-theme);
   @include breadcrumbs.theme($light-theme);
+  @include footer.theme($light-theme);
 }

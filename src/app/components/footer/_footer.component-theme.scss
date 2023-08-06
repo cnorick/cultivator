@@ -8,33 +8,20 @@
     $warn-palette: map.get($color-config, 'warn');
     $is-dark-theme: map.get($color-config, 'is-dark');
 
-    .breadcrumb {
-        a,
-        span {
-            color: rgb(88, 88, 88);
-            @if $is-dark-theme {
-                color: rgb(190, 190, 190);
-            }
-        }
+    footer {
+      background-color: mat.get-color-from-palette($primary-palette, 'lighter');
+      color: mat.get-color-from-palette($primary-palette, 'lighter-contrast');
     }
-
 }
 
 @mixin typography($theme) {
     $typography-config: mat.get-typography-config($theme);
-
-    .breadcrumb {
-        a,
-        span {
-            font-weight: mat.font-weight($typography-config, 'caption');
-        }
-    }
 }
 
 @mixin theme($theme) {
     $color-config: mat.get-color-config($theme);
 
-    @if $color-config  !=null {
+    @if $color-config != null {
         @include color($theme);
     }
 
