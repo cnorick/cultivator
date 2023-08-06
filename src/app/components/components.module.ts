@@ -11,6 +11,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TransactionComponent } from './transaction/transaction.component';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   declarations: [
@@ -19,6 +21,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     AuthCallbackComponent,
     BreadcrumbsComponent,
     CategorySelectorComponent,
+    TransactionComponent,
   ],
   imports: [
     CommonModule,
@@ -27,6 +30,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     MatFormFieldModule,
     MatInputModule,
     MatDividerModule,
+    MatCardModule,
     FormsModule,
     ReactiveFormsModule,
   ],
@@ -36,6 +40,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     AuthCallbackComponent,
     BreadcrumbsComponent,
     CategorySelectorComponent,
+    TransactionComponent,
   ],
 })
 export class ComponentsModule {}

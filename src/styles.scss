@@ -1,5 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @use "@angular/material" as mat;
+@use "./app/components/transaction/transaction-theme.component" as transaction;
+
 @import "@angular/material/theming";
 @include mat.core();
 
@@ -22,3 +24,4 @@ $angular-default-theme: mat.define-light-theme(
 );
 
 @include mat.all-component-themes($angular-default-theme);
+@include transaction.theme($angular-default-theme);

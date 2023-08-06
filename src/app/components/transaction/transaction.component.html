@@ -1,0 +1,24 @@
+<mat-card>
+  <a [routerLink]="transaction.transaction_id">
+    <mat-card-header>
+      <mat-card-title>{{transaction.full_description}}</mat-card-title>
+      <mat-card-subtitle>
+        {{transaction.amount | currency}}&nbsp;|
+        <ng-container *ngIf="transaction.category; else uncategorized">
+          {{transaction.category}}
+        </ng-container>
+        <ng-template #uncategorized><span class="uncategorized">uncategorized</span></ng-template>
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <span class="content-block">
+        <span>{{transaction.date | date}}</span>
+      </span>
+      <span class="content-block">
+        <span>{{transaction.institution}}</span>
+        <span>{{transaction.account}}</span>
+        <span>{{transaction['account_#']}}</span>
+      </span>
+    </mat-card-content>
+  </a>
+</mat-card>

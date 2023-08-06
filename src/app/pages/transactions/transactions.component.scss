@@ -7,27 +7,3 @@
 mat-spinner {
   margin: 0 auto;
 }
-
-.uncategorized {
-  color: red;
-}
-
-a {
-  color: unset;
-  text-decoration: none;
-}
-
-mat-card {
-  margin-bottom: 1em;
-}
-
-mat-card-content {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-
-  .content-block {
-    display: flex;
-    flex-direction: column;
-  }
-}
