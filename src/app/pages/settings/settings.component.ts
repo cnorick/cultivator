@@ -8,7 +8,7 @@ import { SettingsService } from 'src/app/services/settings.service';
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.less'],
+  styleUrls: ['./settings.component.scss'],
 })
 export class SettingsComponent implements OnDestroy {
   private destroy$ = new Subject<void>();

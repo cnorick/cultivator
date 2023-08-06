@@ -6,7 +6,7 @@ import { GoogleAuthService } from '../../services/google-auth.service';
 @Component({
   selector: 'app-auth-callback',
   templateUrl: './auth-callback.component.html',
-  styleUrls: ['./auth-callback.component.less'],
+  styleUrls: ['./auth-callback.component.scss'],
 })
 export class AuthCallbackComponent {
   constructor(

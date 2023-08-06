@@ -22,7 +22,7 @@ interface Filter {
 @Component({
   selector: 'app-transactions',
   templateUrl: './transactions.component.html',
-  styleUrls: ['./transactions.component.less'],
+  styleUrls: ['./transactions.component.scss'],
 })
 export class TransactionsComponent {
   constructor(private transactionsService: TransactionsService) {}

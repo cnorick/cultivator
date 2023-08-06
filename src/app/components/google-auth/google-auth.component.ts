@@ -4,7 +4,7 @@ import { GoogleAuthService } from 'src/app/services/google-auth.service';
 @Component({
   selector: 'app-google-auth',
   templateUrl: './google-auth.component.html',
-  styleUrls: ['./google-auth.component.less'],
+  styleUrls: ['./google-auth.component.scss'],
 })
 export class GoogleAuthComponent {
   constructor(private googleAuthService: GoogleAuthService) {}

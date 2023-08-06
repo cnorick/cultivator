@@ -16,7 +16,7 @@ import FuzzySearch from 'fuzzy-search';
 @Component({
   selector: 'app-category-selector',
   templateUrl: './category-selector.component.html',
-  styleUrls: ['./category-selector.component.less'],
+  styleUrls: ['./category-selector.component.scss'],
 })
 export class CategorySelectorComponent implements OnInit, OnDestroy {
   @Input() selectedCategory?: string;
