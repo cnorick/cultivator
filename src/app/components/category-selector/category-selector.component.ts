@@ -1,16 +1,19 @@
 import {
+  ChangeDetectorRef,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   OnDestroy,
   OnInit,
   Output,
+  ViewChild,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { combineLatest, map, startWith, Subject, takeUntil } from 'rxjs';
 import { CategoryService } from 'src/app/services/category.service';
-import { Category } from 'src/app/types/category';
+import { Category, CATEGORY_LOADING_VAL } from 'src/app/types/category';
 import FuzzySearch from 'fuzzy-search';
 
 @Component({
@@ -19,26 +22,50 @@ import FuzzySearch from 'fuzzy-search';
   styleUrls: ['./category-selector.component.scss'],
 })
 export class CategorySelectorComponent implements OnInit, OnDestroy {
-  @Input() selectedCategory?: string;
+  @Input()
+  set selectedCategory(val: string | undefined) {
+    this._selectedCategory = val;
+    if (this.selectedCategory === CATEGORY_LOADING_VAL) {
+      this.selectedCategory = '...Loading';
+    }
+    this.categoryCtl.setValue(this.selectedCategory || 'None');
+  }
+  get selectedCategory(): string | undefined {
+    return this._selectedCategory;
+  }
+  private _selectedCategory?: string;
+
   @Output() selectedCategoryChange = new EventEmitter<Category>();
 
+  @ViewChild('input') inputEl!: ElementRef<HTMLInputElement>;
+
   private destroy$ = new Subject<void>();
+
   categoryCtl = new FormControl('None');
   filteredCategories: Category[] = [];
 
-  constructor(private categoryService: CategoryService) {
+  constructor(
+    private categoryService: CategoryService,
+    private cdr: ChangeDetectorRef
+  ) {
     this.filteredCategories$
       .pipe(takeUntil(this.destroy$))
       .subscribe((categories) => (this.filteredCategories = categories));
   }
 
-  ngOnInit(): void {
-    this.categoryCtl.setValue(this.selectedCategory || 'None');
-  }
+  ngOnInit(): void {}
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  focus(): void {
+    window.setTimeout(() => {
+      this.inputEl.nativeElement.focus({ preventScroll: true });
+      this.onInputFocus({ target: this.inputEl.nativeElement } as any);
+      this.cdr.detectChanges();
+    }, 40);
   }
 
   private filteredCategories$ = combineLatest([
