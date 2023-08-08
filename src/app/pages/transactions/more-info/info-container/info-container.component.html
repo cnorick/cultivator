@@ -10,7 +10,7 @@
       <span class="data" matListItemLine>{{t.date | date: 'fullDate'}}</span>
     </mat-list-item>
     <mat-divider></mat-divider>
-    <mat-list-item routerLink="./category">
+    <mat-list-item routerLink="./category" skipLocationChange>
       <span class="label" matListItemLine>Category</span>
       <span class="data" matListItemLine>
         <ng-container *ngIf="t.category !== CATEGORY_LOADING_VAL; else placeholderSpinner">{{t.category ||
@@ -46,7 +46,7 @@
       <span class="data" matListItemLine>{{t.date_added | date: 'fullDate'}}</span>
     </mat-list-item>
     <mat-divider></mat-divider>
-    <mat-list-item routerLink="./notes">
+    <mat-list-item routerLink="./notes" skipLocationChange>
       <span class="label" matListItemLine>Notes</span>
       <span class="data" matListItemLine>
         <ng-container *ngIf="t.notes !== CATEGORY_LOADING_VAL; else placeholderSpinner">{{t.notes}}</ng-container>
