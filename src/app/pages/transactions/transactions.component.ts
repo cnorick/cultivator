@@ -33,6 +33,7 @@ export class TransactionsComponent {
     private activatedRoute: ActivatedRoute
   ) {
     activatedRoute.queryParamMap.pipe(take(1)).subscribe((queryParams) => {
+      this.toggleOffAllFilters();
       const filterNames = queryParams.get('filters')?.split(',') ?? [];
       for (let filterName of filterNames) {
         const filter = this.allFilters.find(
@@ -89,6 +90,12 @@ export class TransactionsComponent {
 
   private convertFilterNameToParam(name: string) {
     return name.replace(/\s/, '-').toLowerCase();
+  }
+
+  private toggleOffAllFilters() {
+    for (let filter of this.allFilters) {
+      this.toggleFilter(filter, false);
+    }
   }
 
   private toggleFilter(filter: Filter, state: boolean) {
