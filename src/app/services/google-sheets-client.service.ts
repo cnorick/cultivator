@@ -1,5 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
 import { GoogleAuthService } from './google-auth.service';
 import { LogService } from './log.service';
 
@@ -16,11 +19,25 @@ export class GoogleSheetsClientService {
   constructor(
     private auth: GoogleAuthService,
     private http: HttpClient,
-    private logger: LogService
+    private logger: LogService,
+    private snackbar: MatSnackBar,
+    private router: Router
   ) {
     this.auth.accessToken$.subscribe(
       (accessToken) => (this.accessToken = accessToken)
     );
+  }
+
+  private checkIfLoggedOut(error: any) {
+    if (error instanceof HttpErrorResponse) {
+      if (error?.status === 401) {
+        this.logger.log('Logged out');
+        const snack = this.snackbar.open('You are logged out.', 'Log back in', {
+          duration: 25_000,
+        });
+        snack.onAction().subscribe(() => this.router.navigate(['/login']));
+      }
+    }
   }
 
   private get<T>(url: string) {
@@ -29,15 +46,18 @@ export class GoogleSheetsClientService {
       throw new Error('Not logged into Google.');
     }
 
-    try {
-      return this.http.get<T>(url, {
+    return this.http
+      .get<T>(url, {
         headers: { Authorization: `Bearer ${this.accessToken}` },
-      });
-    } catch (error) {
-      this.logger.log(`Error making get request to ${url}`);
-      this.logger.log(error);
-      throw error;
-    }
+      })
+      .pipe(
+        catchError((error) => {
+          this.checkIfLoggedOut(error);
+          this.logger.log(`Error making get request to ${url}`);
+          this.logger.log(error);
+          return throwError(() => error);
+        })
+      );
   }
 
   private put<T>(url: string, body: any) {
@@ -45,15 +65,18 @@ export class GoogleSheetsClientService {
       throw new Error('Not logged into Google.');
     }
 
-    try {
-      return this.http.put<T>(url, body, {
+    return this.http
+      .put<T>(url, body, {
         headers: { Authorization: `Bearer ${this.accessToken}` },
-      });
-    } catch (error) {
-      this.logger.log(`Error making put request to ${url}`);
-      this.logger.log(error);
-      throw error;
-    }
+      })
+      .pipe(
+        catchError((error) => {
+          this.checkIfLoggedOut(error);
+          this.logger.log(`Error making put request to ${url}`);
+          this.logger.log(error);
+          return throwError(() => error);
+        })
+      );
   }
 
   public getAllSheets(spreadsheetId: string) {
