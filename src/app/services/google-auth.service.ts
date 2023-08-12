@@ -109,10 +109,7 @@ export class GoogleAuthService {
   }
 
   public createAuthUrl(state?: AuthState) {
-    const scopes = [
-      'https://www.googleapis.com/auth/drive.file',
-      'https://www.googleapis.com/auth/drive.metadata.readonly',
-    ];
+    const scopes = ['https://www.googleapis.com/auth/drive.file'];
     const CLIENT_ID = environment.GoogleClient.ClientId;
 
     const CALLBACK_URL = `${window.location.protocol}//${window.location.host}/oauth2callback`;
