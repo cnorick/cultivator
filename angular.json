@@ -32,7 +32,7 @@
               "src/favicon-32x32.png",
               "src/assets",
               {
-                "glob": "google-picker.html",
+                "glob": "*",
                 "input": "src/static-pages/",
                 "output": "/"
               },

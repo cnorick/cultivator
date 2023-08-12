@@ -2,5 +2,15 @@ footer {
   text-align: center;
   padding: .8em;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: .5em;
+}
+
+.footer-text {
+  margin-right: 1em;
+}
+
+.spacer {
+  flex-grow: 2;
 }
