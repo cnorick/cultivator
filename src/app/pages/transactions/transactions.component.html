@@ -6,10 +6,21 @@
   </mat-chip-listbox>
 </mat-toolbar>
 <ng-container *ngIf="transactions$ | async as transactions; else spinner">
-  <app-transaction [transaction]="t" *ngFor="let t of transactions"></app-transaction>
+  <ng-container *ngIf="transactions.length > 0; else noTransactions">
+    <app-transaction [transaction]="t" *ngFor="let t of transactions"></app-transaction>
+  </ng-container>
 </ng-container>
 
+<ng-template #noTransactions>
+  <div class="progress-message">
+    No transactions to show
+    <div class="sub-message">Try changing the filters</div>
+  </div>
+</ng-template>
+
 <ng-template #spinner>
-  Loading Transactions...
+  <div class="progress-message">
+    Loading Transactions...
+  </div>
   <mat-spinner></mat-spinner>
 </ng-template>
