@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { MatChipSelectionChange } from '@angular/material/chips';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
+import { LocalStorageService } from 'src/app/services/local-storage.service';
 import {
   TransactionFilter,
   TransactionsService,
@@ -27,14 +28,25 @@ interface Filter {
   styleUrls: ['./transactions.component.scss'],
 })
 export class TransactionsComponent {
+  private static readonly FILTER_STORAGE_KEY = 'transaction_filters';
+
   constructor(
     private transactionsService: TransactionsService,
     private router: Router,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private localStorage: LocalStorageService
   ) {
     activatedRoute.queryParamMap.pipe(take(1)).subscribe((queryParams) => {
+      // Check the query params first and use those filters if there are some. Otherwise, use the stored ones.
+      let filterNames = queryParams.get('filters')?.split(',') ?? [];
+      if (!filterNames.length) {
+        filterNames =
+          this.localStorage
+            .getItem(TransactionsComponent.FILTER_STORAGE_KEY)
+            ?.split(',') ?? [];
+      }
+
       this.toggleOffAllFilters();
-      const filterNames = queryParams.get('filters')?.split(',') ?? [];
       for (let filterName of filterNames) {
         const filter = this.allFilters.find(
           (f) => this.convertFilterNameToParam(f.name) === filterName
@@ -103,14 +115,20 @@ export class TransactionsComponent {
     filter.onChange?.(state, this.allFilters);
 
     const selectedFilters = this.allFilters.filter((f) => f.selected);
+    const filtersParamString = selectedFilters
+      .map((f) => this.convertFilterNameToParam(f.name))
+      .join(',');
+
     this.transactionsService.setFilters(selectedFilters.map((f) => f.filter));
+    this.localStorage.setItem(
+      TransactionsComponent.FILTER_STORAGE_KEY,
+      filtersParamString
+    );
 
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
       queryParams: {
-        filters: selectedFilters
-          .map((f) => this.convertFilterNameToParam(f.name))
-          .join(','),
+        filters: filtersParamString,
       },
       queryParamsHandling: 'merge', // remove to replace all query params by provided
       replaceUrl: true,
