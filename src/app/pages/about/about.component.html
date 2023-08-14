@@ -1,4 +1,4 @@
-<div class="button-container">
+<div *ngIf="!(loggedIn$ | async)" class="button-container">
   <a mat-flat-button color="accent" href="/login">Log In to Google to Get Started</a>
 </div>
 
