@@ -1,5 +1,5 @@
 <div class="breadcrumb">
-  <ng-container *ngFor="let breadcrumb of breadcrumbs; last as isLast">
+  <ng-container *ngFor="let breadcrumb of breadcrumbs$ | async; last as isLast">
     <a class="crumb" [routerLink]="breadcrumb.url" routerLinkActive="router-link-active">
       {{ breadcrumb.label }}
     </a>
