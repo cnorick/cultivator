@@ -1,6 +1,7 @@
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, map, skip } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, skip } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthState } from '../types/auth-state';
 import { LocalStorageService } from './local-storage.service';
@@ -63,10 +64,27 @@ export class GoogleAuthService {
     }
   }
 
+  private revokeToken(token?: string): Observable<any> {
+    if (!token) {
+      return of(null);
+    }
+
+    return this.http
+      .post(`https://oauth2.googleapis.com/revoke?token=${token}`, null)
+      .pipe(
+        catchError((err: HttpErrorResponse) => {
+          this.logger.error('error revoking token');
+          this.logger.error(err);
+          return of(null);
+        })
+      );
+  }
+
   constructor(
     private localStorage: LocalStorageService,
     private logger: LogService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {
     this.token$.pipe(skip(1)).subscribe((token) => {
       if (!token && this.existingUser) {
@@ -144,8 +162,10 @@ export class GoogleAuthService {
     this.localStorage.removeItem(GoogleAuthService.TOKEN_STORAGE_KEY);
     this.localStorage.removeItem(GoogleAuthService.EXISTING_USER_STORAGE_KEY);
     this._existingUser = false;
-    this.token$.next(undefined);
-    this.router.navigate(['/about']);
+    this.revokeToken(this.token$.value?.accessToken).subscribe((a) => {
+      this.token$.next(undefined);
+      this.router.navigate(['/about']);
+    });
   }
 
   public reauthenticate(state?: AuthState) {
