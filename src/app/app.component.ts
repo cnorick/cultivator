@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
 import {
+  ActivatedRoute,
   NavigationCancel,
   NavigationEnd,
   NavigationError,
   NavigationStart,
   Router,
 } from '@angular/router';
-import { startWith } from 'rxjs';
+import { map, startWith } from 'rxjs';
+import { BreadcrumbsService } from './services/breadcrumbs.service';
 import { GoogleAuthService } from './services/google-auth.service';
 
 @Component({
@@ -18,13 +20,31 @@ export class AppComponent {
   // Sets initial value to true to show loading spinner on first load
   loading = true;
 
-  constructor(private auth: GoogleAuthService, private router: Router) {
+  constructor(
+    private auth: GoogleAuthService,
+    private router: Router,
+    private breadcrumbs: BreadcrumbsService,
+    public activatedRoute: ActivatedRoute
+  ) {
     this.router.events.subscribe((e) => {
       this.navigationInterceptor(e);
     });
   }
 
   readonly loggedIn$ = this.auth.loggedIn$.pipe(startWith(false));
+  readonly isRootPage$ = this.breadcrumbs.breadcrumbs$.pipe(
+    map((breadcrumbs) => breadcrumbs && breadcrumbs.length <= 1)
+  );
+  readonly parentPage$ = this.breadcrumbs.breadcrumbs$.pipe(
+    map(
+      (breadcrumbs) =>
+        (breadcrumbs &&
+          breadcrumbs.length > 1 &&
+          breadcrumbs[breadcrumbs?.length - 2]) ||
+        null
+    ),
+    map((breadcrumb) => breadcrumb?.url ?? '/')
+  );
 
   // Shows and hides the loading spinner during RouterEvent changes
   navigationInterceptor(event: any): void {

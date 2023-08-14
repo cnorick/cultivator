@@ -5,8 +5,10 @@
 
   <div class="page">
     <mat-toolbar color="primary">
+      <a mat-icon-button *ngIf="!(isRootPage$ | async)" [routerLink]="parentPage$ | async">
+        <mat-icon>arrow_back_ios</mat-icon>
+      </a>
       <span>Cultivator</span>
-      <span class="example-spacer"></span>
       <button mat-icon-button class="example-icon" aria-label="" (click)="drawer.toggle()">
         <mat-icon>menu</mat-icon>
       </button>

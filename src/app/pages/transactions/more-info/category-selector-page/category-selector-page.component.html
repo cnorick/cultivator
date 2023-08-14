@@ -1,5 +1,4 @@
 <div class="container" *ngIf="(transaction$ | async) as t">
   <app-category-selector (selectedCategoryChange)="onSelectedCategoryChange($event, t)" [selectedCategory]="t.category">
   </app-category-selector>
-  <button mat-button routerLink="..">Back</button>
 </div>

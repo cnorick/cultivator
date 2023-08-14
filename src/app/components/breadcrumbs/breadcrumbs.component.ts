@@ -14,5 +14,5 @@ export interface BreadCrumb {
 export class BreadcrumbsComponent {
   constructor(private breadcrumbsService: BreadcrumbsService) {}
 
-  breadcrumbs$ = this.breadcrumbsService.breadcrumbs$;
+  readonly breadcrumbs$ = this.breadcrumbsService.breadcrumbs$;
 }

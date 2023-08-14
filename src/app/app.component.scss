@@ -13,6 +13,9 @@
   flex: 1 1 auto;
 }
 
+mat-toolbar {
+  justify-content: space-between;
+}
 
 mat-spinner {
   margin: 0 auto;

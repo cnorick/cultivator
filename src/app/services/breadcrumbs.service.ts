@@ -10,8 +10,8 @@ export class BreadcrumbsService {
   public readonly breadcrumbs$ = this.router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
     distinctUntilChanged(),
-    startWith(null),
-    map(() => this.buildBreadCrumb(this.activatedRoute.root))
+    map(() => this.buildBreadCrumb(this.activatedRoute.root)),
+    startWith(null)
   );
 
   constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
@@ -22,7 +22,7 @@ export class BreadcrumbsService {
    * @param url
    * @param breadcrumbs
    */
-  buildBreadCrumb(
+  private buildBreadCrumb(
     route: ActivatedRoute,
     url: string = '',
     breadcrumbs: BreadCrumb[] = []
