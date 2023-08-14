@@ -19,7 +19,8 @@ interface StoredGoogleToken {
   providedIn: 'root',
 })
 export class GoogleAuthService {
-  private static readonly STORAGE_KEY = 'google_access_token';
+  private static readonly TOKEN_STORAGE_KEY = 'google_access_token';
+  private static readonly EXISTING_USER_STORAGE_KEY = 'has_logged_in_before';
 
   private readonly token$ = new BehaviorSubject<StoredGoogleToken | undefined>(
     undefined
@@ -45,6 +46,11 @@ export class GoogleAuthService {
     )
   );
 
+  private _existingUser: boolean;
+  public get existingUser(): boolean {
+    return this._existingUser;
+  }
+
   private _setToken(token?: StoredGoogleToken) {
     this.token$.next(token);
     window.clearTimeout(this.timeoutId);
@@ -67,8 +73,12 @@ export class GoogleAuthService {
     });
 
     const tokenString = this.localStorage.getItem(
-      GoogleAuthService.STORAGE_KEY
+      GoogleAuthService.TOKEN_STORAGE_KEY
     );
+
+    this._existingUser =
+      this.localStorage.getItem(GoogleAuthService.EXISTING_USER_STORAGE_KEY) ===
+      'true';
 
     if (tokenString) {
       const storedToken: StoredGoogleToken = JSON.parse(tokenString);
@@ -101,9 +111,15 @@ export class GoogleAuthService {
 
     const storedToken = { accessToken: newToken.accessToken, expirationTime };
     this.localStorage.setItem(
-      GoogleAuthService.STORAGE_KEY,
+      GoogleAuthService.TOKEN_STORAGE_KEY,
       JSON.stringify(storedToken)
     );
+
+    this.localStorage.setItem(
+      GoogleAuthService.EXISTING_USER_STORAGE_KEY,
+      'true'
+    );
+    this._existingUser = true;
 
     this._setToken(storedToken);
   }
@@ -124,7 +140,7 @@ export class GoogleAuthService {
 
   public clearToken() {
     this.token$.next(undefined);
-    this.localStorage.removeItem(GoogleAuthService.STORAGE_KEY);
+    this.localStorage.removeItem(GoogleAuthService.TOKEN_STORAGE_KEY);
   }
 
   public reauthenticate(state?: AuthState) {

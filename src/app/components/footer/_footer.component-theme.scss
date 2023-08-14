@@ -9,8 +9,8 @@
     $is-dark-theme: map.get($color-config, 'is-dark');
 
     footer {
-      background-color: mat.get-color-from-palette($primary-palette, 'lighter');
-      color: mat.get-color-from-palette($primary-palette, 'lighter-contrast');
+      background-color: mat.get-color-from-palette($primary-palette, 'darker');
+      color: mat.get-color-from-palette($primary-palette, 'darker-contrast');
     }
 }
 

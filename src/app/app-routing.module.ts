@@ -42,6 +42,15 @@ const routes: Routes = [
     },
     title: 'Login',
   },
+  {
+    path: 'about',
+    loadChildren: () =>
+      import('./pages/about/about.module').then((m) => m.AboutModule),
+    data: {
+      breadcrumb: 'About',
+    },
+    title: 'Cultivator Budget App',
+  },
   { path: '', redirectTo: '/transactions', pathMatch: 'full' },
   { path: '**', component: PageNotFoundComponent },
 ];

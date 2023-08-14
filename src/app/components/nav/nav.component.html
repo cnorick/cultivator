@@ -3,11 +3,14 @@
     <mat-list-item role="listitem" *ngIf="!loggedIn" (click)="linkClick.emit()">
       <a mat-button class="nav-link" routerLinkActive="active-link" routerLink="/login">Login</a>
     </mat-list-item>
-    <mat-list-item role="listitem" (click)="linkClick.emit()">
+    <mat-list-item [disabled]="!loggedIn" role="listitem" (click)="linkClick.emit()">
       <a mat-button class="nav-link" routerLink="/transactions" routerLinkActive="active-link">Transactions</a>
     </mat-list-item>
-    <mat-list-item role="listitem" (click)="linkClick.emit()">
+    <mat-list-item [disabled]="!loggedIn" role="listitem" (click)="linkClick.emit()">
       <a mat-button class="nav-link" routerLink="/settings" routerLinkActive="active-link">Settings</a>
+    </mat-list-item>
+    <mat-list-item role="listitem" (click)="linkClick.emit()">
+      <a mat-button class="nav-link" routerLink="/about" routerLinkActive="active-link">About</a>
     </mat-list-item>
   </mat-list>
 </nav>

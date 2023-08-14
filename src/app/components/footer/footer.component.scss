@@ -2,9 +2,10 @@ footer {
   text-align: center;
   padding: .8em;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   flex-wrap: wrap;
   row-gap: .5em;
+  align-items: center;
 }
 
 .footer-text {
