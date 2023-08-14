@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, map, skip } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { AuthState } from '../types/auth-state';
@@ -64,10 +65,11 @@ export class GoogleAuthService {
 
   constructor(
     private localStorage: LocalStorageService,
-    private logger: LogService
+    private logger: LogService,
+    private router: Router
   ) {
     this.token$.pipe(skip(1)).subscribe((token) => {
-      if (!token) {
+      if (!token && this.existingUser) {
         this.reauthenticate();
       }
     });
@@ -138,9 +140,12 @@ export class GoogleAuthService {
     )}&redirect_uri=${CALLBACK_URL}&client_id=${CLIENT_ID}&prompt=${PROMPT}`;
   }
 
-  public clearToken() {
-    this.token$.next(undefined);
+  public logout() {
     this.localStorage.removeItem(GoogleAuthService.TOKEN_STORAGE_KEY);
+    this.localStorage.removeItem(GoogleAuthService.EXISTING_USER_STORAGE_KEY);
+    this._existingUser = false;
+    this.token$.next(undefined);
+    this.router.navigate(['/about']);
   }
 
   public reauthenticate(state?: AuthState) {
