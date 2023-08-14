@@ -56,6 +56,8 @@ export class TransactionsComponent {
           this.toggleFilter(filter, true);
         }
       }
+
+      this.updateQueryParams();
     });
   }
 
@@ -124,15 +126,27 @@ export class TransactionsComponent {
       TransactionsComponent.FILTER_STORAGE_KEY,
       filtersParamString
     );
+  }
 
-    this.router.navigate([], {
-      relativeTo: this.activatedRoute,
-      queryParams: {
-        filters: filtersParamString,
-      },
-      queryParamsHandling: 'merge', // remove to replace all query params by provided
-      replaceUrl: true,
-    });
+  private updateQueryParams() {
+    const selectedFilters = this.allFilters.filter((f) => f.selected);
+    const filtersParamString = selectedFilters
+      .map((f) => this.convertFilterNameToParam(f.name))
+      .join(',');
+
+    const exitingFilterQueryParam =
+      this.activatedRoute.snapshot.queryParamMap.get('filters');
+
+    if (exitingFilterQueryParam !== filtersParamString) {
+      this.router.navigate([], {
+        relativeTo: this.activatedRoute,
+        queryParams: {
+          filters: filtersParamString,
+        },
+        queryParamsHandling: 'merge', // remove to replace all query params by provided
+        replaceUrl: true,
+      });
+    }
   }
 
   onFilterChange(
@@ -141,5 +155,6 @@ export class TransactionsComponent {
     allFilters: Filter[]
   ) {
     this.toggleFilter(filter, event.selected);
+    this.updateQueryParams();
   }
 }
