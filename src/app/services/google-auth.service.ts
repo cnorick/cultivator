@@ -66,6 +66,7 @@ export class GoogleAuthService {
 
   private revokeToken(token?: string): Observable<any> {
     if (!token) {
+      this.logger.error('no token to revoke');
       return of(null);
     }
 
