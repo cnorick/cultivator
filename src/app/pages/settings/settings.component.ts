@@ -2,6 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
+import { FeaturesService } from 'src/app/services/features.service';
 import { LogService } from 'src/app/services/log.service';
 import { SettingsService } from 'src/app/services/settings.service';
 
@@ -19,11 +20,14 @@ export class SettingsComponent implements OnDestroy {
     initialTransactionsLoaded: new FormControl<number>(0),
   });
 
+  readonly notesEnabled$ = this.featuresService.notesEnabled$;
+
   constructor(
     settingsService: SettingsService,
     activatedRoute: ActivatedRoute,
     router: Router,
-    private logger: LogService
+    private logger: LogService,
+    private featuresService: FeaturesService
   ) {
     settingsService.settings$
       .pipe(takeUntil(this.settingsForm.valueChanges))
@@ -56,6 +60,10 @@ export class SettingsComponent implements OnDestroy {
 
   onDownloadLogsClick() {
     this.logger.downloadLogs();
+  }
+
+  onEnableNotes() {
+    this.featuresService.enableNotesFeature();
   }
 
   ngOnDestroy(): void {

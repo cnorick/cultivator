@@ -1,14 +1,44 @@
-<form [formGroup]="settingsForm">
-  <mat-form-field>
-    <mat-label>Google Sheet ID</mat-label>
-    <input matInput type="url" readonly formControlName="spreadsheetId" />
-    <a href="/google-picker.html" matSuffix mat-icon-button aria-label="">
-      <mat-icon>open_in_new</mat-icon>
-    </a>
-  </mat-form-field>
-  <mat-form-field>
-    <mat-label>Transactions Per Page</mat-label>
-    <input matInput type="number" formControlName="initialTransactionsLoaded" />
-  </mat-form-field>
+<h1>Settings</h1>
+<div class="section">
+  <h2>Core</h2>
+  <form [formGroup]="settingsForm">
+    <mat-form-field>
+      <mat-label>Google Sheet ID</mat-label>
+      <input matInput type="url" readonly formControlName="spreadsheetId" />
+      <a href="/google-picker.html" matSuffix mat-icon-button aria-label="">
+        <mat-icon>open_in_new</mat-icon>
+      </a>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Transactions Per Page</mat-label>
+      <input matInput type="number" formControlName="initialTransactionsLoaded" />
+    </mat-form-field>
+  </form>
+</div>
+
+<mat-divider></mat-divider>
+
+<div class="section">
+  <h2>Features</h2>
+  <div class="feature">
+    <div class="feature-name">Notes</div>
+    <div class="feature-text">Adds a notes header to your transaction sheet so that you can take notes in this app</div>
+    <div class="feature-status" [ngSwitch]="(notesEnabled$ | async)">
+      <button mat-flat-button *ngSwitchCase="false" color="warn" (click)="onEnableNotes()">Enable
+        Notes</button>
+      <ng-container *ngSwitchCase="true">
+        <div style="color: green">enabled</div>
+      </ng-container>
+      <ng-container *ngSwitchCase="null">
+        <mat-spinner class="list-item-spinner" diameter="30"></mat-spinner>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<mat-divider></mat-divider>
+
+<div class="section">
+  <h2>Debug</h2>
   <button mat-button (click)="onDownloadLogsClick()">Download Logs</button>
-</form>
+</div>

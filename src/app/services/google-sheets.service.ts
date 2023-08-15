@@ -8,6 +8,7 @@ import {
   shareReplay,
   Subject,
   startWith,
+  of,
 } from 'rxjs';
 import { GoogleSheetsClientService } from './google-sheets-client.service';
 import { convertTableToDictArray, normalizeHeader } from '../utils/table-utils';
@@ -15,6 +16,7 @@ import { SettingsService } from './settings.service';
 import { GoogleAuthService } from './google-auth.service';
 import { refreshMap } from '../utils/refresh-operator';
 import { LogService } from './log.service';
+import { NOTES_HEADER } from './features.service';
 
 const REFRESH_RATE = 60_000;
 
@@ -25,6 +27,10 @@ export class GoogleSheetsService {
   private onUpdateTransaction$ = new Subject<{
     row: number;
     transaction: any;
+  }>();
+
+  private onAddTransactionHeader$ = new Subject<{
+    header: string | number;
   }>();
 
   private triggerRefresh$ = new Subject<void>();
@@ -90,7 +96,7 @@ export class GoogleSheetsService {
     shareReplay()
   );
 
-  private readonly transactionHeaders$ = this.transactionValuesRes$.pipe(
+  public readonly transactionHeaders$ = this.transactionValuesRes$.pipe(
     map((res) => res.values[0] as (string | number)[]),
     shareReplay()
   );
@@ -121,6 +127,27 @@ export class GoogleSheetsService {
     shareReplay()
   );
 
+  private readonly doAddTransactionHeader$ = this.onAddTransactionHeader$.pipe(
+    withLatestFrom(
+      this.transactionHeaders$,
+      this.transactionSheetTitle$,
+      this.spreadsheetId$
+    ),
+    switchMap(([{ header }, existingHeaders, title, id]) => {
+      const headerAlreadyExists = existingHeaders.some(
+        (existingHeader) =>
+          existingHeader.toString().toLowerCase() ===
+          header.toString().toLowerCase()
+      );
+      if (headerAlreadyExists) {
+        return of(null);
+      }
+
+      const updatedHeaders = [...existingHeaders, header];
+      return this.googleClient.updateRow(id!, title, 1, updatedHeaders);
+    })
+  );
+
   public readonly transactionData$ = combineLatest([
     this.transactionHeaders$,
     this.transactionRows$,
@@ -145,13 +172,22 @@ export class GoogleSheetsService {
     this.categoryValuesRes$.subscribe((res) => logger.log(res));
     this.categoryData$.subscribe((res) => logger.log(res));
     this.doUpdateTransaction$.subscribe((res) => logger.log(res));
+    this.doAddTransactionHeader$.subscribe((res) => logger.log(res));
 
     this.doUpdateTransaction$.subscribe(() => {
+      this.triggerRefresh$.next();
+    });
+
+    this.doAddTransactionHeader$.subscribe(() => {
       this.triggerRefresh$.next();
     });
   }
 
   public updateTransactionsRow(row: number, transaction: any) {
     this.onUpdateTransaction$.next({ row, transaction });
+  }
+
+  public addNotesHeader() {
+    this.onAddTransactionHeader$.next({ header: NOTES_HEADER });
   }
 }

@@ -7,3 +7,32 @@
 mat-form-field {
   width: 100%;
 }
+
+.section {
+  &:not(:first-of-type){
+    padding-top: 2em;
+  }
+  &:not(:last-of-type){
+    padding-bottom: 2em;
+  }
+}
+
+.feature {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  .feature-name {
+  }
+
+  .feature-text {
+    max-width: 50vw;
+  }
+
+  .feature-status {
+    display: flex;
+    justify-content: flex-end;
+    min-width: 8.5em;
+    text-align: right;
+  }
+}

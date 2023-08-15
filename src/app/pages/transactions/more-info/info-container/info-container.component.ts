@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
+import { FeaturesService } from 'src/app/services/features.service';
 import { TransactionsService } from 'src/app/services/transactions.service';
 import { CATEGORY_LOADING_VAL } from 'src/app/types/category';
 
@@ -13,7 +14,8 @@ export class InfoContainerComponent {
   readonly CATEGORY_LOADING_VAL = CATEGORY_LOADING_VAL;
   constructor(
     private transactionsService: TransactionsService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private featuresService: FeaturesService
   ) {}
 
   transaction$ = combineLatest([
@@ -24,4 +26,6 @@ export class InfoContainerComponent {
       transactions?.find((t) => t.transaction_id === paramMap.get('id'))
     )
   );
+
+  readonly notesEnabled$ = this.featuresService.notesEnabled$;
 }

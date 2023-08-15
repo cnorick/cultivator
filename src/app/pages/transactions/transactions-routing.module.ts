@@ -6,6 +6,7 @@ import {
   ActivatedRouteSnapshot,
 } from '@angular/router';
 import { map } from 'rxjs';
+import { featureGuard } from 'src/app/guards/feature.guard';
 import { TransactionsService } from 'src/app/services/transactions.service';
 import { CategorySelectorPageComponent } from './more-info/category-selector-page/category-selector-page.component';
 import { InfoContainerComponent } from './more-info/info-container/info-container.component';
@@ -61,6 +62,7 @@ const routes: Routes = [
         path: 'notes',
         component: NotesComponent,
         title: getTransactionTitleResolver('Notes'),
+        canActivate: [featureGuard('notes')],
       },
     ],
   },

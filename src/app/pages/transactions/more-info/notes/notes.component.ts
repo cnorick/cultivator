@@ -43,7 +43,7 @@ export class NotesComponent implements AfterViewInit {
     map((notes) => {
       if (notes === CATEGORY_LOADING_VAL) {
         return '...Loading';
-      } else return notes;
+      } else return notes ?? '';
     })
   );
 
