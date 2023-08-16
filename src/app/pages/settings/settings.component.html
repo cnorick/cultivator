@@ -21,7 +21,7 @@
 <div class="section">
   <h2>Features</h2>
   <div class="feature">
-    <div class="feature-name">Notes</div>
+    <div class="feature-name">Notes:</div>
     <div class="feature-text">Adds a notes header to your transaction sheet so that you can take notes in this app</div>
     <div class="feature-status" [ngSwitch]="(notesEnabled$ | async)">
       <button mat-flat-button *ngSwitchCase="false" color="warn" (click)="onEnableNotes()">Enable
