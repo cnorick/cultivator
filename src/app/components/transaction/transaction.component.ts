@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { CATEGORY_LOADING_VAL } from 'src/app/types/category';
 import { Transaction } from 'src/app/types/transaction';
 
 @Component({
@@ -7,5 +8,6 @@ import { Transaction } from 'src/app/types/transaction';
   styleUrls: ['./transaction.component.scss'],
 })
 export class TransactionComponent {
+  readonly CATEGORY_LOADING_VAL = CATEGORY_LOADING_VAL;
   @Input() transaction!: Transaction;
 }

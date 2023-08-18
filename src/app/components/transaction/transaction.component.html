@@ -4,10 +4,15 @@
       <mat-card-title>{{transaction.full_description}}</mat-card-title>
       <mat-card-subtitle>
         {{transaction.amount | currency}}&nbsp;|
-        <ng-container *ngIf="transaction.category; else uncategorized">
-          {{transaction.category}}
-        </ng-container>
-        <ng-template #uncategorized><span class="uncategorized">uncategorized</span></ng-template>
+        <span>
+          <ng-container *ngIf="transaction.category === CATEGORY_LOADING_VAL">
+            <mat-spinner class="list-item-spinner" diameter="15"></mat-spinner>
+          </ng-container>
+          <span *ngIf="!transaction.category" class="uncategorized">uncategorized</span>
+          <ng-container *ngIf="!!transaction.category && transaction.category !== CATEGORY_LOADING_VAL">
+            {{transaction.category}}
+          </ng-container>
+        </span>
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
