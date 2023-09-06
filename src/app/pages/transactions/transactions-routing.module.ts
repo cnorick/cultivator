@@ -50,15 +50,16 @@ const routes: Routes = [
         path: '',
         component: InfoContainerComponent,
         title: getTransactionTitleResolver(),
+        data: { gaTitle: 'Transaction' },
       },
       {
         path: 'category',
-        data: { breadcrumb: 'Category' },
+        data: { breadcrumb: 'Category', gaTitle: 'Transaction Category' },
         component: CategorySelectorPageComponent,
         title: getTransactionTitleResolver('Category'),
       },
       {
-        data: { breadcrumb: 'Notes' },
+        data: { breadcrumb: 'Notes', gaTitle: 'Transaction Notes' },
         path: 'notes',
         component: NotesComponent,
         title: getTransactionTitleResolver('Notes'),

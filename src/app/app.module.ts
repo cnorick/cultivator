@@ -20,6 +20,7 @@ import { PwaService } from './services/pwa.service';
 import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { SWUpdateService } from './services/sw-update.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { PageViewTrackingService } from './services/page-view-tracking.service';
 
 const initializer = (pwaService: PwaService) => () =>
   pwaService.initPwaPrompt();
@@ -52,7 +53,7 @@ const initializer = (pwaService: PwaService) => () =>
     {
       provide: APP_INITIALIZER,
       useFactory: initializer,
-      deps: [PwaService, SWUpdateService],
+      deps: [PwaService, SWUpdateService, PageViewTrackingService],
       multi: true,
     },
   ],
