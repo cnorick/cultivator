@@ -16,8 +16,24 @@ mat-card-content {
     display: flex;
     flex-direction: column;
   }
+  .right-content {
+    justify-content: flex-end;
+  }
 }
 
 .list-item-spinner {
   display: inline-flex;
+}
+
+.notes-container {
+  padding-top: 1rem;
+  padding-right: 2rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  filter: brightness(85%);
+  font-size: .85em;
+  font-style: italic;
 }

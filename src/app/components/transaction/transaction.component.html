@@ -5,12 +5,11 @@
       <mat-card-subtitle>
         {{transaction.amount | currency}}&nbsp;|
         <span>
-          <ng-container *ngIf="transaction.category === CATEGORY_LOADING_VAL">
-            <mat-spinner class="list-item-spinner" diameter="15"></mat-spinner>
-          </ng-container>
-          <span *ngIf="!transaction.category" class="uncategorized">uncategorized</span>
-          <ng-container *ngIf="!!transaction.category && transaction.category !== CATEGORY_LOADING_VAL">
-            {{transaction.category}}
+          <ng-container *ngIf="transaction.category !== CATEGORY_LOADING_VAL; else placeholderSpinner">
+            <span *ngIf="!transaction.category" class="uncategorized">uncategorized</span>
+            <ng-container *ngIf="!!transaction.category">
+              {{transaction.category}}
+            </ng-container>
           </ng-container>
         </span>
       </mat-card-subtitle>
@@ -18,8 +17,12 @@
     <mat-card-content>
       <span class="content-block">
         <span>{{transaction.date | date}}</span>
+        <span class="notes-container">
+          <ng-container
+            *ngIf="transaction.notes !== CATEGORY_LOADING_VAL; else placeholderSpinner">{{transaction.notes}}</ng-container>
+        </span>
       </span>
-      <span class="content-block">
+      <span class="content-block right-content">
         <span>{{transaction.institution}}</span>
         <span>{{transaction.account}}</span>
         <span>{{transaction['account_#']}}</span>
@@ -27,3 +30,7 @@
     </mat-card-content>
   </a>
 </mat-card>
+
+<ng-template #placeholderSpinner>
+  <mat-spinner class="list-item-spinner" diameter="15"></mat-spinner>
+</ng-template>
