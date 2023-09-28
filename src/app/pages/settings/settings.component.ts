@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { map, Subject, takeUntil } from 'rxjs';
 import { FeaturesService } from 'src/app/services/features.service';
 import { LogService } from 'src/app/services/log.service';
 import { SettingsService } from 'src/app/services/settings.service';
@@ -21,9 +21,12 @@ export class SettingsComponent implements OnDestroy {
   });
 
   readonly notesEnabled$ = this.featuresService.notesEnabled$;
+  readonly showFeatures$ = this.settingsService.spreadsheetId$.pipe(
+    map((spreadsheetId) => !!spreadsheetId)
+  );
 
   constructor(
-    settingsService: SettingsService,
+    private settingsService: SettingsService,
     activatedRoute: ActivatedRoute,
     router: Router,
     private logger: LogService,
