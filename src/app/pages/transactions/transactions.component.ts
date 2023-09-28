@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { MatChipSelectionChange } from '@angular/material/chips';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
+import { FeaturesService } from 'src/app/services/features.service';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
 import {
   TransactionFilter,
@@ -34,7 +35,8 @@ export class TransactionsComponent {
     private transactionsService: TransactionsService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private localStorage: LocalStorageService
+    private localStorage: LocalStorageService,
+    private featuresService: FeaturesService
   ) {
     activatedRoute.queryParamMap.pipe(take(1)).subscribe((queryParams) => {
       // Check the query params first and use those filters if there are some. Otherwise, use the stored ones.
@@ -62,6 +64,7 @@ export class TransactionsComponent {
   }
 
   transactions$ = this.transactionsService.shownTransactions$;
+  manualTransactionsEnabled$ = this.featuresService.manualTransactionsEnabled$;
 
   readonly allFilters: Filter[] = [
     {

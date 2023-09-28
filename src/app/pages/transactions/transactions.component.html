@@ -11,6 +11,12 @@
   </ng-container>
 </ng-container>
 
+<app-fab *ngIf="manualTransactionsEnabled$ | async">
+  <button title="Add Manual Transaction" mat-fab color="primary">
+    <mat-icon>add</mat-icon>
+  </button>
+</app-fab>
+
 <ng-template #noTransactions>
   <div class="progress-message">
     No transactions to show

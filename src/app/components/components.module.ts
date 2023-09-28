@@ -21,6 +21,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { FooterComponent } from './footer/footer.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { FabComponent } from './fab/fab.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     NavComponent,
     PromptComponent,
     FooterComponent,
+    FabComponent,
   ],
   imports: [
     CommonModule,
@@ -59,6 +61,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     TransactionComponent,
     NavComponent,
     FooterComponent,
+    FabComponent,
   ],
 })
 export class ComponentsModule {}
