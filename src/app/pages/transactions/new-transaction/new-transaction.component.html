@@ -1,1 +1,31 @@
-<p>new-transaction works!</p>
+<h1>New Transaction</h1>
+<form [formGroup]="newTransactionForm" (ngSubmit)="onSubmit()" class="form-container">
+  <mat-form-field>
+    <mat-label>Title</mat-label>
+    <input matInput formControlName="title">
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Amount</mat-label>
+    <input matInput formControlName="amount">
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Transaction Date
+    </mat-label>
+    <input matInput [matDatepicker]="picker" formControlName="date">
+    <mat-hint>MM/DD/YYYY</mat-hint>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+
+  <app-category-selector [selectedCategory]="newTransactionForm.value.category?.category"
+    (selectedCategoryChange)="newTransactionForm.controls.category.setValue($event)"></app-category-selector>
+
+  <mat-form-field>
+    <mat-label>Notes:</mat-label>
+    <textarea matInput type="textarea" formControlName="notes"></textarea>
+  </mat-form-field>
+
+  <button color="primary" mat-flat-button type="submit" [disabled]="!newTransactionForm.valid">Create</button>
+</form>

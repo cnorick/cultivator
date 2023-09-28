@@ -1,0 +1,14 @@
+:host {
+  margin: 1em;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+
+  &>* {
+    margin-top: .7rem;
+  }
+}

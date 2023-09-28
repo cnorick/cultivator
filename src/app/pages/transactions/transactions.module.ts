@@ -18,6 +18,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { InfoContainerComponent } from './more-info/info-container/info-container.component';
 import { NotesComponent } from './more-info/notes/notes.component';
 import { NewTransactionComponent } from './new-transaction/new-transaction.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @NgModule({
   declarations: [
@@ -31,6 +34,7 @@ import { NewTransactionComponent } from './new-transaction/new-transaction.compo
   imports: [
     CommonModule,
     TransactionsRoutingModule,
+    ReactiveFormsModule,
     MatCardModule,
     MatButtonModule,
     MatProgressSpinnerModule,
@@ -42,6 +46,8 @@ import { NewTransactionComponent } from './new-transaction/new-transaction.compo
     MatListModule,
     MatDividerModule,
     MatIconModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
   ],
 })
 export class TransactionsModule {}
