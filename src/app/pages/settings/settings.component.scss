@@ -17,29 +17,8 @@ mat-form-field {
   }
 }
 
-.feature {
+.features-container {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1em;
-
-  .feature-name {
-  }
-
-  .feature-text {
-    max-width: 50vw;
-    flex: 1;
-  }
-
-  button {
-    width: 100%;
-  }
-
-  .feature-status {
-    display: flex;
-    justify-content: flex-end;
-    min-width: 8.5em;
-    text-align: right;
-  }
+  flex-direction: column;
+  gap: 2em;
 }

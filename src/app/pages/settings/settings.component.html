@@ -20,19 +20,27 @@
 
 <div *ngIf="showFeatures$ | async" class="section">
   <h2>Features</h2>
-  <div class="feature">
-    <div class="feature-name">Notes:</div>
-    <div class="feature-text">Adds a notes header to your transaction sheet so that you can take notes in this app</div>
-    <div class="feature-status" [ngSwitch]="(notesEnabled$ | async)">
-      <button mat-flat-button *ngSwitchCase="false" color="warn" (click)="onEnableNotes()">Enable
-        Notes</button>
-      <ng-container *ngSwitchCase="true">
-        <div style="color: green">enabled</div>
-      </ng-container>
-      <ng-container *ngSwitchCase="null">
-        <mat-spinner class="list-item-spinner" diameter="30"></mat-spinner>
-      </ng-container>
-    </div>
+
+  <div class="features-container">
+    <mat-card *ngFor="let feature of features" class="feature-card">
+      <mat-card-header>
+        <mat-card-title>{{feature.name}}</mat-card-title>
+        <mat-card-subtitle *ngIf="feature.enabled$ | async">
+          <div style="color: green">enabled</div>
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>{{feature.description}}</mat-card-content>
+      <mat-card-actions
+        *ngIf="(feature.enabled$ | async) && !!feature.disable || (feature.enabled$ | async) === false && !!feature.enable">
+        <button mat-button *ngIf="(feature.enabled$ | async) === false && !!feature.enable" color="accent"
+          (click)="feature.enable()">Enable</button>
+        <button mat-button *ngIf="(feature.enabled$ | async) && !!feature.disable" color="warn"
+          (click)="feature.disable()">Disable</button>
+      </mat-card-actions>
+      <mat-card-footer *ngIf="(feature.enabled$ | async) === null">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      </mat-card-footer>
+    </mat-card>
   </div>
 </div>
 
@@ -41,4 +49,5 @@
 <div class="section">
   <h2>Debug</h2>
   <button mat-button (click)="onDownloadLogsClick()">Download Logs</button>
+  <button mat-button color="warn" (click)="onDeleteSheetMetadata()">Delete Sheet Metadata</button>
 </div>

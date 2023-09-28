@@ -1,11 +1,19 @@
 import { Component, OnDestroy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map, Subject, takeUntil } from 'rxjs';
+import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { FeaturesService } from 'src/app/services/features.service';
 import { GoogleSheetsService } from 'src/app/services/google-sheets.service';
 import { LogService } from 'src/app/services/log.service';
 import { SettingsService } from 'src/app/services/settings.service';
+
+interface Feature {
+  name: string;
+  description: string;
+  enabled$: Observable<boolean | null>;
+  enable?: () => void;
+  disable?: () => void;
+}
 
 @Component({
   selector: 'app-settings',
@@ -27,6 +35,24 @@ export class SettingsComponent implements OnDestroy {
   readonly showFeatures$ = this.settingsService.spreadsheetId$.pipe(
     map((spreadsheetId) => !!spreadsheetId)
   );
+
+  readonly features: Feature[] = [
+    {
+      name: 'Notes',
+      description:
+        'Adds a notes header to your transaction sheet so that you can take notes in this app',
+      enabled$: this.notesEnabled$,
+      enable: () => this.onEnableNotes(),
+    },
+    {
+      name: 'Manual Transactions',
+      description:
+        'Adds the ability to create manual transactions from this app',
+      enabled$: this.manualTransactionsEnabled$,
+      enable: () => this.onEnableManualTransactions(),
+      disable: () => this.onDisableManualTransactions(),
+    },
+  ];
 
   constructor(
     private settingsService: SettingsService,
