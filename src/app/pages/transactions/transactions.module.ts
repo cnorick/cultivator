@@ -17,6 +17,7 @@ import { CategorySelectorPageComponent } from './more-info/category-selector-pag
 import { MatIconModule } from '@angular/material/icon';
 import { InfoContainerComponent } from './more-info/info-container/info-container.component';
 import { NotesComponent } from './more-info/notes/notes.component';
+import { NewTransactionComponent } from './new-transaction/new-transaction.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { NotesComponent } from './more-info/notes/notes.component';
     CategorySelectorPageComponent,
     InfoContainerComponent,
     NotesComponent,
+    NewTransactionComponent,
   ],
   imports: [
     CommonModule,

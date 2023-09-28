@@ -12,9 +12,9 @@
 </ng-container>
 
 <app-fab *ngIf="manualTransactionsEnabled$ | async">
-  <button title="Add Manual Transaction" mat-fab color="primary">
+  <a routerLink="./new" title="Add Manual Transaction" mat-fab color="primary">
     <mat-icon>add</mat-icon>
-  </button>
+  </a>
 </app-fab>
 
 <ng-template #noTransactions>

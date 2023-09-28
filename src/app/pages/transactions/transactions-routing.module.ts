@@ -13,6 +13,7 @@ import { InfoContainerComponent } from './more-info/info-container/info-containe
 import { MoreInfoComponent } from './more-info/more-info.component';
 import { NotesComponent } from './more-info/notes/notes.component';
 import { TransactionsComponent } from './transactions.component';
+import { NewTransactionComponent } from './new-transaction/new-transaction.component';
 
 const getTransactionTitleResolver =
   (append?: string) =>
@@ -37,6 +38,14 @@ const routes: Routes = [
     path: '',
     component: TransactionsComponent,
     title: 'Transactions',
+  },
+  {
+    path: 'new',
+    component: NewTransactionComponent,
+    data: {
+      breadcrumb: 'New',
+    },
+    title: 'New Transaction',
   },
   {
     path: ':id',
