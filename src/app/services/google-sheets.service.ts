@@ -9,6 +9,7 @@ import {
   Subject,
   startWith,
   of,
+  tap,
 } from 'rxjs';
 import { GoogleSheetsClientService } from './google-sheets-client.service';
 import { convertTableToDictArray, normalizeHeader } from '../utils/table-utils';
@@ -33,7 +34,7 @@ export class GoogleSheetsService {
     header: string | number;
   }>();
 
-  private triggerRefresh$ = new Subject<void>();
+  private triggerTransactionRefresh$ = new Subject<void>();
 
   private readonly spreadsheetId$ = this.settings.spreadsheetId$;
 
@@ -79,7 +80,7 @@ export class GoogleSheetsService {
 
   private readonly transactionValuesRes$ = combineLatest([
     this.transactionSheetTitle$,
-    this.triggerRefresh$.pipe(startWith('')),
+    this.triggerTransactionRefresh$.pipe(startWith('')),
   ]).pipe(
     withLatestFrom(this.spreadsheetId$),
     refreshMap(([[title, _], id]) => {
@@ -175,11 +176,11 @@ export class GoogleSheetsService {
     this.doAddTransactionHeader$.subscribe((res) => logger.log(res));
 
     this.doUpdateTransaction$.subscribe(() => {
-      this.triggerRefresh$.next();
+      this.triggerTransactionRefresh$.next();
     });
 
     this.doAddTransactionHeader$.subscribe(() => {
-      this.triggerRefresh$.next();
+      this.triggerTransactionRefresh$.next();
     });
   }
 

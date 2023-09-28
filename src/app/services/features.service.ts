@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { map, startWith } from 'rxjs';
+import { map, shareReplay } from 'rxjs';
 import { GoogleSheetsService } from './google-sheets.service';
 
 export const NOTES_HEADER = 'Notes';
@@ -17,7 +17,7 @@ export class FeaturesService {
           (h) => h.toString().toLowerCase() === NOTES_HEADER.toLowerCase()
         )
       ),
-      startWith(null)
+      shareReplay(1)
     );
 
   public enableNotesFeature() {
