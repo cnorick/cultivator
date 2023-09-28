@@ -3,6 +3,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, Subject, takeUntil } from 'rxjs';
 import { FeaturesService } from 'src/app/services/features.service';
+import { GoogleSheetsService } from 'src/app/services/google-sheets.service';
 import { LogService } from 'src/app/services/log.service';
 import { SettingsService } from 'src/app/services/settings.service';
 
@@ -21,6 +22,8 @@ export class SettingsComponent implements OnDestroy {
   });
 
   readonly notesEnabled$ = this.featuresService.notesEnabled$;
+  readonly manualTransactionsEnabled$ =
+    this.featuresService.manualTransactionsEnabled$;
   readonly showFeatures$ = this.settingsService.spreadsheetId$.pipe(
     map((spreadsheetId) => !!spreadsheetId)
   );
@@ -30,7 +33,8 @@ export class SettingsComponent implements OnDestroy {
     activatedRoute: ActivatedRoute,
     router: Router,
     private logger: LogService,
-    private featuresService: FeaturesService
+    private featuresService: FeaturesService,
+    private sheetsService: GoogleSheetsService
   ) {
     settingsService.settings$
       .pipe(takeUntil(this.settingsForm.valueChanges))
@@ -67,6 +71,18 @@ export class SettingsComponent implements OnDestroy {
 
   onEnableNotes() {
     this.featuresService.enableNotesFeature();
+  }
+
+  onEnableManualTransactions() {
+    this.featuresService.enableManualTransactionsFeature();
+  }
+
+  onDisableManualTransactions() {
+    this.featuresService.disableManualTransactions();
+  }
+
+  onDeleteSheetMetadata() {
+    this.sheetsService.deleteMetadata();
   }
 
   ngOnDestroy(): void {

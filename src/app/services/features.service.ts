@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { map, shareReplay } from 'rxjs';
+import { map, shareReplay, startWith } from 'rxjs';
 import { GoogleSheetsService } from './google-sheets.service';
 
 export const NOTES_HEADER = 'Notes';
@@ -20,7 +20,26 @@ export class FeaturesService {
       shareReplay(1)
     );
 
+  public readonly manualTransactionsEnabled$ =
+    this.googleSheetsService.cultivatorGlobalDeveloperMetadataValue$.pipe(
+      map((metadata) => !!metadata?.manualTransactionsEnabled),
+      startWith(null),
+      shareReplay(1)
+    );
+
   public enableNotesFeature() {
     this.googleSheetsService.addNotesHeader();
+  }
+
+  public enableManualTransactionsFeature() {
+    this.googleSheetsService.updateGlobalMetadata({
+      manualTransactionsEnabled: true,
+    });
+  }
+
+  public disableManualTransactions() {
+    this.googleSheetsService.updateGlobalMetadata({
+      manualTransactionsEnabled: false,
+    });
   }
 }

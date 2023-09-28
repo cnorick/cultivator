@@ -2,9 +2,10 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { catchError, of, throwError } from 'rxjs';
 import { GoogleAuthService } from './google-auth.service';
 import { LogService } from './log.service';
+import { CultivatorMetadata } from '../types/cultivator-metadata';
 
 @Injectable({
   providedIn: 'root',
@@ -79,6 +80,25 @@ export class GoogleSheetsClientService {
       );
   }
 
+  private post<T>(url: string, body: any) {
+    if (!this.accessToken) {
+      throw new Error('Not logged into Google.');
+    }
+
+    return this.http
+      .post<T>(url, body, {
+        headers: { Authorization: `Bearer ${this.accessToken}` },
+      })
+      .pipe(
+        catchError((error) => {
+          this.checkIfLoggedOut(error);
+          this.logger.log(`Error making post request to ${url}`);
+          this.logger.log(error);
+          return throwError(() => error);
+        })
+      );
+  }
+
   public getAllSheets(spreadsheetId: string) {
     return this.get<any>(`${this.baseUrl}/${spreadsheetId}`);
   }
@@ -123,5 +143,82 @@ export class GoogleSheetsClientService {
         values: [data],
       }
     );
+  }
+
+  public deleteGlobalMetadata(spreadsheetId: string, metadataKey: string) {
+    return this.post(`${this.baseUrl}/${spreadsheetId}:batchUpdate`, {
+      requests: [
+        {
+          deleteDeveloperMetadata: {
+            dataFilter: {
+              developerMetadataLookup: {
+                metadataLocation: {
+                  spreadsheet: true,
+                },
+                metadataKey: metadataKey,
+              },
+            },
+          },
+        },
+      ],
+    });
+  }
+  public updateGlobalMetadata(
+    spreadsheetId: string,
+    metadataKey: string,
+    metadataValue: string,
+    visibility: 'DOCUMENT' | 'PROJECT'
+  ) {
+    return this.post(`${this.baseUrl}/${spreadsheetId}:batchUpdate`, {
+      requests: [
+        {
+          updateDeveloperMetadata: {
+            dataFilters: [
+              {
+                developerMetadataLookup: {
+                  metadataLocation: {
+                    spreadsheet: true,
+                  },
+                  metadataKey,
+                },
+              },
+            ],
+            developerMetadata: {
+              metadataKey,
+              metadataValue,
+              location: {
+                spreadsheet: true,
+              },
+              visibility,
+            },
+            fields: '*',
+          },
+        },
+      ],
+    });
+  }
+
+  public addGlobalMetadata(
+    spreadsheetId: string,
+    metadataKey: string,
+    metadataValue: string,
+    visibility: 'DOCUMENT' | 'PROJECT'
+  ) {
+    return this.post(`${this.baseUrl}/${spreadsheetId}:batchUpdate`, {
+      requests: [
+        {
+          createDeveloperMetadata: {
+            developerMetadata: {
+              metadataKey,
+              metadataValue,
+              location: {
+                spreadsheet: true,
+              },
+              visibility,
+            },
+          },
+        },
+      ],
+    });
   }
 }
