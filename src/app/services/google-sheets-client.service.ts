@@ -145,6 +145,29 @@ export class GoogleSheetsClientService {
     );
   }
 
+  /**
+   *
+   * @param spreadsheetId
+   * @param sheetTitle
+   * @param rowNum the 1-based row number, corresponding to the sheet row number at which
+   * we should insert the new row. The current value at that row will be pushed down.
+   * @param data
+   */
+  public appendRow(
+    spreadsheetId: string,
+    sheetTitle: string,
+    rowNum: number,
+    data: any[]
+  ) {
+    const formattedRange = `${sheetTitle}!A${rowNum}:A${rowNum}`;
+    return this.post(
+      `${this.baseUrl}/${spreadsheetId}/values/${formattedRange}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+      {
+        values: [data],
+      }
+    );
+  }
+
   public deleteGlobalMetadata(spreadsheetId: string, metadataKey: string) {
     return this.post(`${this.baseUrl}/${spreadsheetId}:batchUpdate`, {
       requests: [

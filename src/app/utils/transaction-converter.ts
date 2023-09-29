@@ -26,8 +26,21 @@ export function convertDataDictToTransaction(
 }
 
 export function convertTransactionToDataDict(
-  transaction: Transaction
+  transaction: Partial<Transaction>
 ): DataDict {
+  const firstDayOfMonth = transaction.date
+    ? createLotusDate(
+        new Date(transaction.date.getFullYear(), transaction.date.getMonth(), 1)
+      )
+    : null;
+
+  const dateCopy = new Date(transaction.date?.getTime() ?? '');
+  const firstDayOfWeek = transaction.date
+    ? createLotusDate(
+        new Date(dateCopy.setDate(dateCopy.getDate() - dateCopy.getDay()))
+      )
+    : null;
+
   return {
     ...transaction.original,
     account: transaction.account ?? '',
@@ -43,5 +56,7 @@ export function convertTransactionToDataDict(
     institution: transaction.institution ?? '',
     notes: transaction.notes ?? '',
     transaction_id: transaction.transaction_id ?? '',
+    week: firstDayOfWeek,
+    month: firstDayOfMonth,
   };
 }

@@ -8,7 +8,14 @@
   <mat-form-field>
     <mat-label>Amount</mat-label>
     <input matInput formControlName="amount">
+    <mat-error *ngIf="amount?.errors?.['min']">Must be a positive number. Select "Expense" for negative
+      number</mat-error>
   </mat-form-field>
+
+  <mat-radio-group formControlName="type" aria-label="Select an option">
+    <mat-radio-button value="expense">Expense</mat-radio-button>
+    <mat-radio-button value="income">Income</mat-radio-button>
+  </mat-radio-group>
 
   <mat-form-field>
     <mat-label>Transaction Date

@@ -17,6 +17,6 @@ export function parseLotusDate(
 }
 
 export function createLotusDate(date: Date): number {
-  const dec30_1899 = new Date(1899, 11, 30);
+  const dec30_1899 = new Date(1899, 11, 30, 0, 0, 0, 0);
   return (date.getTime() - dec30_1899.getTime()) / (24 * 60 * 60 * 1000);
 }

@@ -32,6 +32,8 @@ export class GoogleSheetsService {
     transaction: any;
   }>();
 
+  private onAppendTransaction$ = new Subject<any>();
+
   private onAddTransactionHeader$ = new Subject<{
     header: string | number;
   }>();
@@ -153,6 +155,18 @@ export class GoogleSheetsService {
     shareReplay()
   );
 
+  private readonly doAppendTransaction$ = this.onAppendTransaction$.pipe(
+    withLatestFrom(
+      this.transactionHeaders$,
+      this.transactionSheetTitle$,
+      this.spreadsheetId$
+    ),
+    switchMap(([transaction, headers, title, id]) => {
+      const data = headers.map((h) => transaction[normalizeHeader(h)]);
+      return this.googleClient.appendRow(id!, title, 3, data);
+    })
+  );
+
   private readonly doAddTransactionHeader$ = this.onAddTransactionHeader$.pipe(
     withLatestFrom(
       this.transactionHeaders$,
@@ -242,6 +256,10 @@ export class GoogleSheetsService {
       this.triggerTransactionRefresh$.next();
     });
 
+    this.doAppendTransaction$.subscribe(() => {
+      this.triggerTransactionRefresh$.next();
+    });
+
     this.doAddTransactionHeader$.subscribe(() => {
       this.triggerTransactionRefresh$.next();
     });
@@ -257,6 +275,10 @@ export class GoogleSheetsService {
 
   public updateTransactionsRow(row: number, transaction: any) {
     this.onUpdateTransaction$.next({ row, transaction });
+  }
+
+  public addTransactionRow(transaction: any) {
+    this.onAppendTransaction$.next(transaction);
   }
 
   public addNotesHeader() {
