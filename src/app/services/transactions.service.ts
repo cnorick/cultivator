@@ -8,9 +8,13 @@ import {
 } from 'rxjs';
 import { Category, CATEGORY_LOADING_VAL } from '../types/category';
 import { Transaction } from '../types/transaction';
-import { convertDataDictToTransaction } from '../utils/transaction-converter';
+import {
+  convertDataDictToTransaction,
+  convertTransactionToDataDict,
+} from '../utils/transaction-converter';
 import { GoogleSheetsService } from './google-sheets.service';
 import { SettingsService } from './settings.service';
+import { v4 as uuidv4 } from 'uuid';
 
 export type TransactionFilter = (
   transaction: Transaction,
@@ -75,5 +79,17 @@ export class TransactionsService {
     transaction.notes = CATEGORY_LOADING_VAL;
 
     this.googleSheets.updateTransactionsRow(transaction.sheetsRow, dataDict);
+  }
+
+  public addManualTransaction(transaction: Partial<Transaction>) {
+    console.log(transaction);
+    const id = `${uuidv4()}-manual`;
+    const dataDict = {
+      ...convertTransactionToDataDict(transaction),
+      transaction_id: id,
+    };
+
+    this.googleSheets.addTransactionRow(dataDict);
+    return id;
   }
 }

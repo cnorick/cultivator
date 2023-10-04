@@ -1,5 +1,5 @@
 import { Transaction } from '../types/transaction';
-import { createLotusDate, parseLotusDate } from './date-utils';
+import { parseLotusDate } from './date-utils';
 
 type DataDict = { [key: string]: string | number | undefined };
 
@@ -26,8 +26,23 @@ export function convertDataDictToTransaction(
 }
 
 export function convertTransactionToDataDict(
-  transaction: Transaction
+  transaction: Partial<Transaction>
 ): DataDict {
+  const firstDayOfMonth = transaction.date
+    ? new Date(
+        transaction.date.getFullYear(),
+        transaction.date.getMonth(),
+        1
+      ).toLocaleDateString()
+    : null;
+
+  const dateCopy = new Date(transaction.date?.getTime() ?? '');
+  const firstDayOfWeek = transaction.date
+    ? new Date(
+        dateCopy.setDate(dateCopy.getDate() - dateCopy.getDay())
+      ).toLocaleDateString()
+    : null;
+
   return {
     ...transaction.original,
     account: transaction.account ?? '',
@@ -35,13 +50,14 @@ export function convertTransactionToDataDict(
     amount: transaction.amount,
     category: transaction.category ?? '',
     check_number: transaction.check_number ?? '',
-    date: transaction.date && createLotusDate(transaction.date),
-    date_added:
-      transaction.date_added && createLotusDate(transaction.date_added),
+    date: transaction.date?.toLocaleDateString(),
+    date_added: transaction.date_added?.toLocaleDateString(),
     description: transaction.description ?? '',
     full_description: transaction.full_description ?? '',
     institution: transaction.institution ?? '',
     notes: transaction.notes ?? '',
     transaction_id: transaction.transaction_id ?? '',
+    week: firstDayOfWeek,
+    month: firstDayOfMonth,
   };
 }
