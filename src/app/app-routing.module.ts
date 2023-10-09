@@ -34,6 +34,16 @@ const routes: Routes = [
     title: 'Settings',
   },
   {
+    path: 'debug',
+    loadChildren: () =>
+      import('./pages/debug/debug.module').then((m) => m.DebugModule),
+    canActivate: [],
+    data: {
+      breadcrumb: 'Debug',
+    },
+    title: 'Debug',
+  },
+  {
     path: 'login',
     loadChildren: () =>
       import('./pages/login/login.module').then((m) => m.LoginModule),

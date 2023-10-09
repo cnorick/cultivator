@@ -58,9 +58,7 @@ export class SettingsComponent implements OnDestroy {
     private settingsService: SettingsService,
     activatedRoute: ActivatedRoute,
     router: Router,
-    private logger: LogService,
-    private featuresService: FeaturesService,
-    private sheetsService: GoogleSheetsService
+    private featuresService: FeaturesService
   ) {
     settingsService.settings$
       .pipe(takeUntil(this.settingsForm.valueChanges))
@@ -91,10 +89,6 @@ export class SettingsComponent implements OnDestroy {
       });
   }
 
-  onDownloadLogsClick() {
-    this.logger.downloadLogs();
-  }
-
   onEnableNotes() {
     this.featuresService.enableNotesFeature();
   }
@@ -105,10 +99,6 @@ export class SettingsComponent implements OnDestroy {
 
   onDisableManualTransactions() {
     this.featuresService.disableManualTransactions();
-  }
-
-  onDeleteSheetMetadata() {
-    this.sheetsService.deleteMetadata();
   }
 
   ngOnDestroy(): void {
