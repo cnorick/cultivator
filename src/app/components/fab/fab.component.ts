@@ -1,9 +1,10 @@
 import { Component, HostListener } from '@angular/core';
 
 @Component({
-  selector: 'app-fab',
-  templateUrl: './fab.component.html',
-  styleUrls: ['./fab.component.scss'],
+    selector: 'app-fab',
+    templateUrl: './fab.component.html',
+    styleUrls: ['./fab.component.scss'],
+    standalone: false
 })
 export class FabComponent {
   // @HostListener('window:scroll', ['$event']) // for window scroll events

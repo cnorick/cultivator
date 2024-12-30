@@ -1,4 +1,4 @@
-import { NgModule, isDevMode, APP_INITIALIZER } from '@angular/core';
+import { NgModule, isDevMode, inject, provideAppInitializer } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
@@ -45,12 +45,10 @@ const initializer = (pwaService: PwaService) => () =>
             registrationStrategy: 'registerWhenStable:30000',
         })], providers: [
         { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 5000 } },
-        {
-            provide: APP_INITIALIZER,
-            useFactory: initializer,
-            deps: [PwaService, SWUpdateService, PageViewTrackingService],
-            multi: true,
-        },
+        provideAppInitializer(() => {
+        const initializerFn = (initializer)(inject(PwaService), inject(SWUpdateService), inject(PageViewTrackingService));
+        return initializerFn();
+      }),
         provideHttpClient(withInterceptorsFromDi()),
     ] })
 export class AppModule {}

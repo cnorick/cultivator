@@ -6,9 +6,10 @@ import { TransactionsService } from 'src/app/services/transactions.service';
 import { CATEGORY_LOADING_VAL } from 'src/app/types/category';
 
 @Component({
-  selector: 'app-info-container',
-  templateUrl: './info-container.component.html',
-  styleUrls: ['./info-container.component.scss'],
+    selector: 'app-info-container',
+    templateUrl: './info-container.component.html',
+    styleUrls: ['./info-container.component.scss'],
+    standalone: false
 })
 export class InfoContainerComponent {
   readonly CATEGORY_LOADING_VAL = CATEGORY_LOADING_VAL;

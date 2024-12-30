@@ -2,9 +2,10 @@ import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-page-not-found-component',
-  templateUrl: './page-not-found.component.html',
-  styleUrls: ['./page-not-found.component.scss'],
+    selector: 'app-page-not-found-component',
+    templateUrl: './page-not-found.component.html',
+    styleUrls: ['./page-not-found.component.scss'],
+    standalone: false
 })
 export class PageNotFoundComponent {
   constructor(private location: Location) {}

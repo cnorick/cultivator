@@ -17,9 +17,10 @@ import { Category, CATEGORY_LOADING_VAL } from 'src/app/types/category';
 import FuzzySearch from 'fuzzy-search';
 
 @Component({
-  selector: 'app-category-selector',
-  templateUrl: './category-selector.component.html',
-  styleUrls: ['./category-selector.component.scss'],
+    selector: 'app-category-selector',
+    templateUrl: './category-selector.component.html',
+    styleUrls: ['./category-selector.component.scss'],
+    standalone: false
 })
 export class CategorySelectorComponent implements OnInit, OnDestroy {
   @Input()

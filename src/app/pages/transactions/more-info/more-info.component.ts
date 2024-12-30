@@ -4,9 +4,10 @@ import { combineLatest, map } from 'rxjs';
 import { TransactionsService } from 'src/app/services/transactions.service';
 
 @Component({
-  selector: 'app-more-info',
-  templateUrl: './more-info.component.html',
-  styleUrls: ['./more-info.component.scss'],
+    selector: 'app-more-info',
+    templateUrl: './more-info.component.html',
+    styleUrls: ['./more-info.component.scss'],
+    standalone: false
 })
 export class MoreInfoComponent {
   constructor(
