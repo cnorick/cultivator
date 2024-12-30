@@ -22,33 +22,49 @@ import { SWUpdateService } from './services/sw-update.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PageViewTrackingService } from './services/page-view-tracking.service';
 
-const initializer = (pwaService: PwaService) => () =>
-  pwaService.initPwaPrompt();
+const initializer =
+  (
+    pwaService: PwaService,
+    swUpdateService: SWUpdateService,
+    pageViewTrackingService: PageViewTrackingService
+  ) =>
+  () =>
+    pwaService.initPwaPrompt();
 
-@NgModule({ declarations: [AppComponent],
-    bootstrap: [AppComponent], imports: [BrowserModule,
-        AppRoutingModule,
-        BrowserAnimationsModule,
-        MatToolbarModule,
-        MatIconModule,
-        MatButtonModule,
-        MatSidenavModule,
-        MatListModule,
-        MatSnackBarModule,
-        MatBottomSheetModule,
-        MatProgressSpinnerModule,
-        ComponentsModule,
-        ServiceWorkerModule.register('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            // Register the ServiceWorker as soon as the application is stable
-            // or after 30 seconds (whichever comes first).
-            registrationStrategy: 'registerWhenStable:30000',
-        })], providers: [
-        { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 5000 } },
-        provideAppInitializer(() => {
-        const initializerFn = (initializer)(inject(PwaService), inject(SWUpdateService), inject(PageViewTrackingService));
-        return initializerFn();
-      }),
-        provideHttpClient(withInterceptorsFromDi()),
-    ] })
+@NgModule({
+  declarations: [AppComponent],
+  bootstrap: [AppComponent],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    MatToolbarModule,
+    MatIconModule,
+    MatButtonModule,
+    MatSidenavModule,
+    MatListModule,
+    MatSnackBarModule,
+    MatBottomSheetModule,
+    MatProgressSpinnerModule,
+    ComponentsModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
+  ],
+  providers: [
+    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 5000 } },
+    provideAppInitializer(() => {
+      const initializerFn = initializer(
+        inject(PwaService),
+        inject(SWUpdateService),
+        inject(PageViewTrackingService)
+      );
+      return initializerFn();
+    }),
+    provideHttpClient(withInterceptorsFromDi()),
+  ],
+})
 export class AppModule {}
