@@ -11,7 +11,10 @@
 
   <mat-form-field>
     <mat-label>Search</mat-label>
-    <input type="text" placeholder="Search for transactions" [formControl]="searchControl"  matInput #input>
+    <input type="text" placeholder="Search for transactions" [formControl]="searchControl" matInput #input>
+    <button *ngIf="searchControl.value" matSuffix mat-icon-button aria-label="Clear" (click)="searchControl.setValue('')">
+      <mat-icon>close</mat-icon>
+    </button>
   </mat-form-field>
 </mat-expansion-panel>
 </mat-toolbar>
@@ -30,7 +33,7 @@
 <ng-template #noTransactions>
   <div class="progress-message">
     No transactions to show
-    <div class="sub-message">Try changing the filters</div>
+    <div class="sub-message">Try changing the filters or clearing the search</div>
   </div>
 </ng-template>
 
