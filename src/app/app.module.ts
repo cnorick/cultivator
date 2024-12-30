@@ -1,6 +1,6 @@
-import { NgModule, isDevMode, APP_INITIALIZER } from '@angular/core';
+import { NgModule, isDevMode, inject, provideAppInitializer } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -22,15 +22,21 @@ import { SWUpdateService } from './services/sw-update.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PageViewTrackingService } from './services/page-view-tracking.service';
 
-const initializer = (pwaService: PwaService) => () =>
-  pwaService.initPwaPrompt();
+const initializer =
+  (
+    pwaService: PwaService,
+    swUpdateService: SWUpdateService,
+    pageViewTrackingService: PageViewTrackingService
+  ) =>
+  () =>
+    pwaService.initPwaPrompt();
 
 @NgModule({
   declarations: [AppComponent],
+  bootstrap: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule,
     BrowserAnimationsModule,
     MatToolbarModule,
     MatIconModule,
@@ -50,13 +56,15 @@ const initializer = (pwaService: PwaService) => () =>
   ],
   providers: [
     { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 5000 } },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: initializer,
-      deps: [PwaService, SWUpdateService, PageViewTrackingService],
-      multi: true,
-    },
+    provideAppInitializer(() => {
+      const initializerFn = initializer(
+        inject(PwaService),
+        inject(SWUpdateService),
+        inject(PageViewTrackingService)
+      );
+      return initializerFn();
+    }),
+    provideHttpClient(withInterceptorsFromDi()),
   ],
-  bootstrap: [AppComponent],
 })
 export class AppModule {}

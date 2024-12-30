@@ -12,9 +12,10 @@ import { CATEGORY_LOADING_VAL } from 'src/app/types/category';
 import { Transaction } from 'src/app/types/transaction';
 
 @Component({
-  selector: 'app-notes',
-  templateUrl: './notes.component.html',
-  styleUrls: ['./notes.component.scss'],
+    selector: 'app-notes',
+    templateUrl: './notes.component.html',
+    styleUrls: ['./notes.component.scss'],
+    standalone: false
 })
 export class NotesComponent implements AfterViewInit {
   @ViewChild('input') inputEl!: ElementRef<HTMLTextAreaElement>;

@@ -2,9 +2,10 @@ import { Component } from '@angular/core';
 import { GoogleAuthService } from 'src/app/services/google-auth.service';
 
 @Component({
-  selector: 'app-about',
-  templateUrl: './about.component.html',
-  styleUrls: ['./about.component.scss'],
+    selector: 'app-about',
+    templateUrl: './about.component.html',
+    styleUrls: ['./about.component.scss'],
+    standalone: false
 })
 export class AboutComponent {
   constructor(private googleAuth: GoogleAuthService) {}

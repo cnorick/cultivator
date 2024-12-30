@@ -4,9 +4,10 @@ import { AuthState } from 'src/app/types/auth-state';
 import { GoogleAuthService } from '../../services/google-auth.service';
 
 @Component({
-  selector: 'app-auth-callback',
-  templateUrl: './auth-callback.component.html',
-  styleUrls: ['./auth-callback.component.scss'],
+    selector: 'app-auth-callback',
+    templateUrl: './auth-callback.component.html',
+    styleUrls: ['./auth-callback.component.scss'],
+    standalone: false
 })
 export class AuthCallbackComponent {
   constructor(

@@ -7,9 +7,10 @@ import { Category } from 'src/app/types/category';
 import { Transaction } from 'src/app/types/transaction';
 
 @Component({
-  selector: 'app-category-selector-page',
-  templateUrl: './category-selector-page.component.html',
-  styleUrls: ['./category-selector-page.component.scss'],
+    selector: 'app-category-selector-page',
+    templateUrl: './category-selector-page.component.html',
+    styleUrls: ['./category-selector-page.component.scss'],
+    standalone: false
 })
 export class CategorySelectorPageComponent implements AfterViewInit {
   @ViewChild(CategorySelectorComponent)

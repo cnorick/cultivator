@@ -5,9 +5,10 @@ import {
 } from '@angular/material/bottom-sheet';
 
 @Component({
-  selector: 'app-prompt',
-  templateUrl: './prompt.component.html',
-  styleUrls: ['./prompt.component.scss'],
+    selector: 'app-prompt',
+    templateUrl: './prompt.component.html',
+    styleUrls: ['./prompt.component.scss'],
+    standalone: false
 })
 export class PromptComponent {
   constructor(

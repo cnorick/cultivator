@@ -6,9 +6,10 @@ import { TransactionsService } from 'src/app/services/transactions.service';
 import { Category } from 'src/app/types/category';
 
 @Component({
-  selector: 'app-new-transaction',
-  templateUrl: './new-transaction.component.html',
-  styleUrls: ['./new-transaction.component.scss'],
+    selector: 'app-new-transaction',
+    templateUrl: './new-transaction.component.html',
+    styleUrls: ['./new-transaction.component.scss'],
+    standalone: false
 })
 export class NewTransactionComponent {
   newTransactionForm = new FormGroup({
