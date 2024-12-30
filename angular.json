@@ -83,10 +83,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "tiller-web-app:build:production"
+              "buildTarget": "tiller-web-app:build:production"
             },
             "development": {
-              "browserTarget": "tiller-web-app:build:development"
+              "buildTarget": "tiller-web-app:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -94,7 +94,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "tiller-web-app:build"
+            "buildTarget": "tiller-web-app:build"
           }
         },
         "test": {
