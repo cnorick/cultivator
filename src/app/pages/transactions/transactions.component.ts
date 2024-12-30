@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MatChipSelectionChange } from '@angular/material/chips';
 import { ActivatedRoute, Router } from '@angular/router';
 import { take } from 'rxjs';
@@ -31,6 +32,8 @@ interface Filter {
 export class TransactionsComponent {
   private static readonly FILTER_STORAGE_KEY = 'transaction_filters';
 
+  searchControl = new FormControl<string>('');
+
   constructor(
     private transactionsService: TransactionsService,
     private router: Router,
@@ -60,6 +63,10 @@ export class TransactionsComponent {
       }
 
       this.updateQueryParams();
+    });
+
+    this.searchControl.valueChanges.subscribe((searchTerm) => {
+      this.transactionsService.setSearch(searchTerm || '');
     });
   }
 

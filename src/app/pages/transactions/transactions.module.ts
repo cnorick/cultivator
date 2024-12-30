@@ -18,10 +18,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { InfoContainerComponent } from './more-info/info-container/info-container.component';
 import { NotesComponent } from './more-info/notes/notes.component';
 import { NewTransactionComponent } from './new-transaction/new-transaction.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @NgModule({
   declarations: [
@@ -50,6 +51,8 @@ import { MatRadioModule } from '@angular/material/radio';
     MatDatepickerModule,
     MatNativeDateModule,
     MatRadioModule,
+    MatExpansionModule,
+    FormsModule,
   ],
 })
 export class TransactionsModule {}

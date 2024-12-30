@@ -4,6 +4,16 @@
       (selectionChange)="onFilterChange($event, filter, allFilters)">
       {{filter.name}}</mat-chip-option>
   </mat-chip-listbox>
+<mat-expansion-panel>
+  <mat-expansion-panel-header>
+    <mat-panel-title>Search</mat-panel-title>
+  </mat-expansion-panel-header>
+
+  <mat-form-field>
+    <mat-label>Search</mat-label>
+    <input type="text" placeholder="Search for transactions" [formControl]="searchControl"  matInput #input>
+  </mat-form-field>
+</mat-expansion-panel>
 </mat-toolbar>
 <ng-container *ngIf="transactions$ | async as transactions; else spinner">
   <ng-container *ngIf="transactions.length > 0; else noTransactions">

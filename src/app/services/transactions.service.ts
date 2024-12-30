@@ -38,6 +38,7 @@ export class TransactionsService {
   ]).pipe(map(([loadMoreSteps, stepSize]) => loadMoreSteps * stepSize));
 
   private filters$ = new BehaviorSubject<TransactionFilter[]>([]);
+  private searchTerm$ = new BehaviorSubject<string>('');
 
   public readonly transactions$ = this.googleSheets.transactionData$.pipe(
     map((transactions) =>
@@ -52,10 +53,20 @@ export class TransactionsService {
     this.transactions$,
     this.limit$,
     this.filters$,
+    this.searchTerm$,
   ]).pipe(
-    map(([transactions, limit, filters]) =>
+    map(([transactions, limit, filters, searchTerm]) =>
       filters
         .reduce((acc, filter) => acc.filter(filter), transactions)
+        .filter(
+          (t) =>
+            searchTerm.trim() === '' ||
+            t.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            t.full_description
+              ?.toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
+            t.notes?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
         .slice(0, limit)
         .sort((t1, t2) => (t2.date?.getTime() ?? 0) - (t1.date?.getTime() ?? 0))
     ),
@@ -65,6 +76,10 @@ export class TransactionsService {
 
   public setFilters(filters: TransactionFilter[]) {
     this.filters$.next(filters);
+  }
+
+  public setSearch(search: string) {
+    this.searchTerm$.next(search);
   }
 
   public updateCategory(transaction: Transaction, category: Category) {

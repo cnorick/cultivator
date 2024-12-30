@@ -8,6 +8,18 @@ mat-toolbar {
   margin-bottom: 1em;
   height: auto;
   padding: 0.5em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-expansion-panel {
+  width: 100%;
+  max-width: 400px;
 }
 
 mat-spinner {
