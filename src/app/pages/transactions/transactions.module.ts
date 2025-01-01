@@ -23,6 +23,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { SplitComponent } from './more-info/split/split.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
     InfoContainerComponent,
     NotesComponent,
     NewTransactionComponent,
+    SplitComponent,
   ],
   imports: [
     CommonModule,

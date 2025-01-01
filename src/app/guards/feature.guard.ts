@@ -4,13 +4,16 @@ import { Router } from '@angular/router';
 import { map, skipWhile } from 'rxjs';
 import { FeaturesService } from '../services/features.service';
 
-export const featureGuard = (feature: 'notes') => () => {
+const supportedFeatures = ['notes', 'split'] as const;
+type SupportedFeature = typeof supportedFeatures[number];
+
+export const featureGuard = (feature: SupportedFeature) => () => {
   const featuresService = inject(FeaturesService);
   const snackbar = inject(MatSnackBar);
   const router = inject(Router);
 
   switch (feature) {
-    case 'notes':
+    case 'notes': {
       return featuresService.notesEnabled$.pipe(
         skipWhile((val) => val === null),
         map((enabled) => {
@@ -20,5 +23,18 @@ export const featureGuard = (feature: 'notes') => () => {
           } else return true;
         })
       );
+    }
+
+    case 'split': {
+      return featuresService.splitEnabled$.pipe(
+        skipWhile((val) => val === null),
+        map((enabled) => {
+          if (!enabled) {
+            snackbar.open('Split not enabled.');
+            return router.createUrlTree(['/settings']);
+          } else return true;
+        })
+      );
+    }
   }
 };

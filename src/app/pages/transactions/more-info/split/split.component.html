@@ -1,0 +1,57 @@
+<div>
+  <form [formGroup]="splitsForm" (ngSubmit)="saveSplits()" (keydown.enter)="$event.preventDefault()">
+    <div formArrayName="splits">
+      @for (split of splitsFormArray.controls; track split; let last = $last, i=$index) {
+        <div class="split-container">
+          @if (split.get('category'); as categoryFormControl) {
+            <app-category-selector [selectedCategory]="categoryFormControl.value"
+              (selectedCategoryChange)="categoryFormControl.setValue($event.category)"></app-category-selector>
+          }
+
+          @if (split.get('amount'); as amountFormControl) {
+            <mat-form-field [formGroupName]="i">
+              <mat-label>Amount</mat-label>
+              <span matTextPrefix>$&nbsp;</span>
+              <input type="number" placeholder="Amount" matInput formControlName="amount" [min]="0.01" [max]="totalAmount" required
+                [step]="0.01" (keydown.enter)="addSplit()">
+              @if (amountFormControl.hasError('required')) {
+                <mat-error>Amount is <strong>required</strong></mat-error>
+              }
+              @if (amountFormControl.hasError('max')) {
+                <mat-error>Amount must not be larger than the original amount</mat-error>
+              }
+              @if (amountFormControl.hasError('min')) {
+                <mat-error>Amount must greater than 0</mat-error>
+              }
+            </mat-form-field>
+          }
+
+          @if (splits.length > 1) {
+            <button mat-icon-button (click)="removeSplit(i)">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </div>
+
+        @if (!last) {
+          <mat-divider></mat-divider>
+        }
+      }
+    </div>
+    <div class="button-row">
+      <button type="button" mat-button (click)="addSplit()">
+        <mat-icon>add</mat-icon>
+        Add Split
+      </button>
+
+      <button type="submit" [disabled]="!splitsForm.valid" mat-button>
+        <mat-icon>save</mat-icon>
+        Save Splits
+      </button>
+    </div>
+
+    @if (splitsForm.hasError('invalidSum')) {
+      <mat-error>Amounts must add up to the original amount</mat-error>
+    }
+  </form>
+</div>

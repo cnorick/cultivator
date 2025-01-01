@@ -14,6 +14,7 @@ import { MoreInfoComponent } from './more-info/more-info.component';
 import { NotesComponent } from './more-info/notes/notes.component';
 import { TransactionsComponent } from './transactions.component';
 import { NewTransactionComponent } from './new-transaction/new-transaction.component';
+import { SplitComponent } from './more-info/split/split.component';
 
 const getTransactionTitleResolver =
   (append?: string) =>
@@ -73,6 +74,13 @@ const routes: Routes = [
         component: NotesComponent,
         title: getTransactionTitleResolver('Notes'),
         canActivate: [featureGuard('notes')],
+      },
+      {
+        data: { breadcrumb: 'Split', gaTitle: 'Transaction Split' },
+        path: 'split',
+        component: SplitComponent,
+        title: getTransactionTitleResolver('Split'),
+        canActivate: [featureGuard('split')],
       },
     ],
   },

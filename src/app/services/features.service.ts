@@ -27,6 +27,13 @@ export class FeaturesService {
       shareReplay(1)
     );
 
+  public readonly splitEnabled$ =
+    this.googleSheetsService.cultivatorGlobalDeveloperMetadataValue$.pipe(
+      map((metadata) => !!metadata?.splitEnabled),
+      startWith(null),
+      shareReplay(1)
+    );
+
   public enableNotesFeature() {
     this.googleSheetsService.addNotesHeader();
   }
@@ -40,6 +47,18 @@ export class FeaturesService {
   public disableManualTransactions() {
     this.googleSheetsService.updateGlobalMetadata({
       manualTransactionsEnabled: false,
+    });
+  }
+
+  public enableSplitFeature() {
+    this.googleSheetsService.updateGlobalMetadata({
+      splitEnabled: true,
+    });
+  }
+
+  public disableSplitFeature() {
+    this.googleSheetsService.updateGlobalMetadata({
+      splitEnabled: false,
     });
   }
 }

@@ -22,6 +22,11 @@ export type TransactionFilter = (
   transactions?: Transaction[]
 ) => boolean;
 
+export type TransactionSplit = {
+  category: string;
+  amount: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -97,7 +102,6 @@ export class TransactionsService {
   }
 
   public addManualTransaction(transaction: Partial<Transaction>) {
-    console.log(transaction);
     const id = `${uuidv4()}-manual`;
     const dataDict = {
       ...convertTransactionToDataDict(transaction),
@@ -106,5 +110,32 @@ export class TransactionsService {
 
     this.googleSheets.addTransactionRow(dataDict);
     return id;
+  }
+
+  public splitTransaction(transaction: Transaction, splits: TransactionSplit[]) {
+    const [firstSplit, ...restSplits] = splits;
+
+    console.log('Splitting transaction', transaction, 'into', splits);
+
+    // Update the original transaction with firstSplit.
+    this.googleSheets.updateTransactionsRow(transaction.sheetsRow, {
+      ...transaction.original,
+      category: firstSplit.category,
+      amount: firstSplit.amount,
+    });
+    
+    // Create new transactions for the rest of the splits.
+    for (const split of restSplits) {
+      const id = `${uuidv4()}-split`;
+      const dataDict = {
+        ...convertTransactionToDataDict(transaction),
+        transaction_id: id,
+        category: split.category,
+        amount: split.amount,
+        sheetsRow: null
+      };
+
+      this.googleSheets.addTransactionRow(dataDict, transaction.sheetsRow + 1);
+    }
   }
 }

@@ -32,7 +32,10 @@ export class GoogleSheetsService {
     transaction: any;
   }>();
 
-  private onAppendTransaction$ = new Subject<any>();
+  private onAppendTransaction$ = new Subject<{
+    transaction: any;
+    rowNum?: number;
+  }>();
 
   private onAddTransactionHeader$ = new Subject<{
     header: string | number;
@@ -161,9 +164,11 @@ export class GoogleSheetsService {
       this.transactionSheetTitle$,
       this.spreadsheetId$
     ),
-    switchMap(([transaction, headers, title, id]) => {
+    switchMap(([{ transaction, rowNum }, headers, title, id]) => {
       const data = headers.map((h) => transaction[normalizeHeader(h)]);
-      return this.googleClient.appendRow(id!, title, 3, data);
+
+      // Append after rowNum if provided, otherwise append to the top of the sheet after the headers.
+      return this.googleClient.appendRow(id!, title, rowNum ?? 3, data);
     })
   );
 
@@ -274,11 +279,12 @@ export class GoogleSheetsService {
   }
 
   public updateTransactionsRow(row: number, transaction: any) {
+    console.log(transaction);
     this.onUpdateTransaction$.next({ row, transaction });
   }
 
-  public addTransactionRow(transaction: any) {
-    this.onAppendTransaction$.next(transaction);
+  public addTransactionRow(transaction: any, rowNum?: number) {
+    this.onAppendTransaction$.next({ transaction, rowNum });
   }
 
   public addNotesHeader() {

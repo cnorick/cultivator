@@ -16,10 +16,10 @@ interface Feature {
 }
 
 @Component({
-    selector: 'app-settings',
-    templateUrl: './settings.component.html',
-    styleUrls: ['./settings.component.scss'],
-    standalone: false
+  selector: 'app-settings',
+  templateUrl: './settings.component.html',
+  styleUrls: ['./settings.component.scss'],
+  standalone: false,
 })
 export class SettingsComponent implements OnDestroy {
   private destroy$ = new Subject<void>();
@@ -52,6 +52,14 @@ export class SettingsComponent implements OnDestroy {
       enabled$: this.manualTransactionsEnabled$,
       enable: () => this.onEnableManualTransactions(),
       disable: () => this.onDisableManualTransactions(),
+    },
+    {
+      name: 'Split',
+      description:
+        'Adds the ability to split transactions into multiple categories',
+      enabled$: this.featuresService.splitEnabled$,
+      enable: () => this.onEnableSplit(),
+      disable: () => this.onDisableSplit(),
     },
   ];
 
@@ -100,6 +108,14 @@ export class SettingsComponent implements OnDestroy {
 
   onDisableManualTransactions() {
     this.featuresService.disableManualTransactions();
+  }
+
+  onEnableSplit() {
+    this.featuresService.enableSplitFeature();
+  }
+
+  onDisableSplit() {
+    this.featuresService.disableSplitFeature();
   }
 
   ngOnDestroy(): void {
