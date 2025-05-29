@@ -94,7 +94,7 @@ export class CategorySelectorComponent implements OnInit, OnDestroy {
       caseSensitive: false,
     });
 
-    return searcher.search(value);
+    return searcher.search(value.trim());
   }
 
   onCategoryChange(event: MatAutocompleteSelectedEvent) {
