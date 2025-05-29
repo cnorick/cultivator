@@ -10,12 +10,13 @@ import {
 import { map, startWith } from 'rxjs';
 import { BreadcrumbsService } from './services/breadcrumbs.service';
 import { GoogleAuthService } from './services/google-auth.service';
+import { GoogleSheetsService } from './services/google-sheets.service';
 
 @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
-    standalone: false
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss'],
+  standalone: false,
 })
 export class AppComponent {
   // Sets initial value to true to show loading spinner on first load
@@ -25,13 +26,17 @@ export class AppComponent {
     private auth: GoogleAuthService,
     private router: Router,
     private breadcrumbs: BreadcrumbsService,
-    public activatedRoute: ActivatedRoute
+    public activatedRoute: ActivatedRoute,
+    private googleSheetsService: GoogleSheetsService
   ) {
     this.router.events.subscribe((e) => {
       this.navigationInterceptor(e);
     });
   }
 
+  readonly offline$ = this.googleSheetsService.isOnline$.pipe(
+    map((isOnline) => !isOnline)
+  );
   readonly loggedIn$ = this.auth.loggedIn$.pipe(startWith(false));
   readonly isRootPage$ = this.breadcrumbs.breadcrumbs$.pipe(
     map((breadcrumbs) => breadcrumbs && breadcrumbs.length <= 1)

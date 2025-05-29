@@ -1,3 +1,5 @@
+<mat-icon *ngIf="offline$ | async" color="warn" class="offline-icon" matTooltip="Unable to Connect to Google Sheets">cloud_off</mat-icon>
+
 <mat-drawer-container class="example-container" autosize>
   <mat-drawer #drawer class="example-sidenav" mode="over" position="end">
     <app-nav [loggedIn]="!!(loggedIn$ | async)" (linkClick)="drawer.toggle()"></app-nav>
