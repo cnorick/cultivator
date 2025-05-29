@@ -9,6 +9,9 @@ import {
   Subject,
   startWith,
   of,
+  retry,
+  tap,
+  BehaviorSubject,
 } from 'rxjs';
 import { GoogleSheetsClientService } from './google-sheets-client.service';
 import { convertTableToDictArray, normalizeHeader } from '../utils/table-utils';
@@ -49,6 +52,8 @@ export class GoogleSheetsService {
 
   private triggerFullRefresh$ = new Subject<void>();
 
+  private _isOnline = new BehaviorSubject<boolean>(true);
+
   private readonly spreadsheetId$ = this.settings.spreadsheetId$;
 
   private readonly allSheetsResponse$ = combineLatest([
@@ -60,6 +65,8 @@ export class GoogleSheetsService {
     switchMap(([id]) => this.googleClient.getAllSheets(id!)),
     shareReplay()
   );
+
+  public readonly isOnline$ = this._isOnline.asObservable();
 
   public readonly cultivatorGlobalDeveloperMetadataValue$ =
     this.allSheetsResponse$.pipe(
@@ -116,6 +123,11 @@ export class GoogleSheetsService {
     refreshMap(([[title, _], id]) => {
       return this.googleClient.getSpreadsheetValues(id!, title);
     }, REFRESH_RATE),
+    tap({
+      next: (res) => this._isOnline.next(true),
+      error: (err) => this._isOnline.next(false),
+    }),
+    retry({ delay: REFRESH_RATE }),
     shareReplay()
   );
 
