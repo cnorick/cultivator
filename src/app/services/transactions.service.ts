@@ -66,11 +66,12 @@ export class TransactionsService {
         .filter(
           (t) =>
             searchTerm.trim() === '' ||
-            t.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            t.description?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
             t.full_description
               ?.toLowerCase()
-              .includes(searchTerm.toLowerCase()) ||
-            t.notes?.toLowerCase().includes(searchTerm.toLowerCase())
+              .includes(searchTerm.toLowerCase().trim()) ||
+            t.notes?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+            t.amount?.toString().includes(parseFloat(searchTerm).toString())
         )
         .slice(0, limit)
         .sort((t1, t2) => (t2.date?.getTime() ?? 0) - (t1.date?.getTime() ?? 0))
