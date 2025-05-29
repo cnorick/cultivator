@@ -3,8 +3,6 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
 import { FeaturesService } from 'src/app/services/features.service';
-import { GoogleSheetsService } from 'src/app/services/google-sheets.service';
-import { LogService } from 'src/app/services/log.service';
 import { SettingsService } from 'src/app/services/settings.service';
 
 interface Feature {
@@ -28,6 +26,7 @@ export class SettingsComponent implements OnDestroy {
     spreadsheetId: new FormControl({ value: '', disabled: false }),
     dateFormat: new FormControl(''),
     initialTransactionsLoaded: new FormControl<number>(0),
+    refreshRateSeconds: new FormControl<number>(0),
   });
 
   readonly notesEnabled$ = this.featuresService.notesEnabled$;
@@ -76,6 +75,7 @@ export class SettingsComponent implements OnDestroy {
           spreadsheetId: settings.spreadsheetId ?? '',
           dateFormat: settings.dateFormat ?? '',
           initialTransactionsLoaded: settings.initialTransactionsLoaded ?? 0,
+          refreshRateSeconds: settings.refreshRateSeconds ?? 0,
         })
       );
 

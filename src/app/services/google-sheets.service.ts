@@ -12,6 +12,9 @@ import {
   retry,
   tap,
   BehaviorSubject,
+  distinctUntilChanged,
+  delay,
+  share,
 } from 'rxjs';
 import { GoogleSheetsClientService } from './google-sheets-client.service';
 import { convertTableToDictArray, normalizeHeader } from '../utils/table-utils';
@@ -21,8 +24,6 @@ import { refreshMap } from '../utils/refresh-operator';
 import { LogService } from './log.service';
 import { NOTES_HEADER } from './features.service';
 import { CultivatorMetadata } from '../types/cultivator-metadata';
-
-const REFRESH_RATE = 60_000;
 
 @Injectable({
   providedIn: 'root',
@@ -55,6 +56,11 @@ export class GoogleSheetsService {
   private _isOnline = new BehaviorSubject<boolean>(true);
 
   private readonly spreadsheetId$ = this.settings.spreadsheetId$;
+
+  private readonly refreshRate$ = this.settings.refreshRateSeconds$.pipe(
+    map((seconds) => seconds * 1000),
+    distinctUntilChanged()
+  );
 
   private readonly allSheetsResponse$ = combineLatest([
     this.spreadsheetId$,
@@ -115,19 +121,30 @@ export class GoogleSheetsService {
     shareReplay()
   );
 
-  private readonly transactionValuesRes$ = combineLatest([
-    this.transactionSheetTitle$,
-    this.triggerTransactionRefresh$.pipe(startWith('')),
-  ]).pipe(
-    withLatestFrom(this.spreadsheetId$),
-    refreshMap(([[title, _], id]) => {
-      return this.googleClient.getSpreadsheetValues(id!, title);
-    }, REFRESH_RATE),
-    tap({
-      next: (res) => this._isOnline.next(true),
-      error: (err) => this._isOnline.next(false),
+  private readonly transactionValuesRes$ = this.refreshRate$.pipe(
+    switchMap((refreshRate) =>
+      combineLatest([
+        this.transactionSheetTitle$,
+        this.triggerTransactionRefresh$.pipe(startWith('')),
+      ]).pipe(
+        withLatestFrom(this.spreadsheetId$),
+        refreshMap(([[title, _], id]) => {
+          return this.googleClient.getSpreadsheetValues(id!, title);
+        }, refreshRate),
+        tap({
+          next: (res) => this._isOnline.next(true),
+          error: (err) => this._isOnline.next(false),
+        }),
+        share()
+      )
+    ),
+    retry({
+      delay: (error, retryCount) => {
+        // Exponential backoff: 2^retryCount * 1000ms, max 60s
+        const delayMs = Math.min(Math.pow(2, retryCount) * 1000, 60000);
+        return of(error).pipe(delay(delayMs));
+      },
     }),
-    retry({ delay: REFRESH_RATE }),
     shareReplay()
   );
 

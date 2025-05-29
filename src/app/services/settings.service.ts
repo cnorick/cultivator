@@ -6,6 +6,7 @@ export interface Settings {
   spreadsheetId?: string;
   dateFormat?: string;
   initialTransactionsLoaded?: number;
+  refreshRateSeconds?: number;
 }
 
 @Injectable({
@@ -18,6 +19,7 @@ export class SettingsService {
     spreadsheetId: undefined!,
     dateFormat: undefined!,
     initialTransactionsLoaded: 20,
+    refreshRateSeconds: 10,
   };
 
   private readonly _settings$ = new BehaviorSubject<Settings>({});
@@ -33,6 +35,14 @@ export class SettingsService {
       (settings) =>
         settings.initialTransactionsLoaded ??
         this.defaults.initialTransactionsLoaded!
+    ),
+    distinctUntilChanged()
+  );
+
+  public readonly refreshRateSeconds$ = this._settings$.pipe(
+    map(
+      (settings) =>
+        settings.refreshRateSeconds ?? this.defaults.refreshRateSeconds!
     ),
     distinctUntilChanged()
   );
