@@ -111,7 +111,7 @@ export class SplitComponent {
       splitsWithSign
     );
 
-    this.router.navigate(['../'], { relativeTo: this.activatedRoute });
+    this.router.navigate(['../'], { relativeTo: this.activatedRoute, replaceUrl: true });
   }
 
   private areSplitsValid() {
