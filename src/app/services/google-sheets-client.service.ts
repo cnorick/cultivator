@@ -106,9 +106,9 @@ export class GoogleSheetsClientService {
   /**
    * https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/get
    */
-  public getSpreadsheetValues(spreadsheetId: string, sheetTitle: string) {
+  public getSpreadsheetValues(spreadsheetId: string, range: string) {
     return this.get<any>(
-      `${this.baseUrl}/${spreadsheetId}/values/${sheetTitle}?valueRenderOption=UNFORMATTED_VALUE`
+      `${this.baseUrl}/${spreadsheetId}/values/${range}?valueRenderOption=UNFORMATTED_VALUE`
     );
   }
 

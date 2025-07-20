@@ -4,6 +4,12 @@
   flex-direction: column;
 }
 
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 3em;
+}
+
 mat-form-field {
   width: 100%;
 }

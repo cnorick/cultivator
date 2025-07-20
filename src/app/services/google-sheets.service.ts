@@ -126,10 +126,20 @@ export class GoogleSheetsService {
       combineLatest([
         this.transactionSheetTitle$,
         this.triggerTransactionRefresh$.pipe(startWith('')),
+        this.settings.maxTransactionRows$,
       ]).pipe(
         withLatestFrom(this.spreadsheetId$),
-        refreshMap(([[title, _], id]) => {
-          return this.googleClient.getSpreadsheetValues(id!, title);
+        refreshMap(([[title, _, maxTransactionRows], id]) => {
+          // If 0 or nullish, get all rows. Otherwise, limit to the specified number of rows.
+          if (maxTransactionRows) {
+            return this.googleClient.getSpreadsheetValues(
+              id!,
+              `${title}!1:${maxTransactionRows + 1}` // sheets is 1-indexed
+            );
+          }
+          else {
+            return this.googleClient.getSpreadsheetValues(id!, title);
+          }
         }, refreshRate),
         tap({
           next: (res) => this._isOnline.next(true),

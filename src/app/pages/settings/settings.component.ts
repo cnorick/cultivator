@@ -26,6 +26,7 @@ export class SettingsComponent implements OnDestroy {
     spreadsheetId: new FormControl({ value: '', disabled: false }),
     dateFormat: new FormControl(''),
     initialTransactionsLoaded: new FormControl<number>(0),
+    maxTransactionRows: new FormControl<number>(0),
     refreshRateSeconds: new FormControl<number>(0),
   });
 
@@ -75,6 +76,7 @@ export class SettingsComponent implements OnDestroy {
           spreadsheetId: settings.spreadsheetId ?? '',
           dateFormat: settings.dateFormat ?? '',
           initialTransactionsLoaded: settings.initialTransactionsLoaded ?? 0,
+          maxTransactionRows: settings.maxTransactionRows ?? 0,
           refreshRateSeconds: settings.refreshRateSeconds ?? 0,
         })
       );

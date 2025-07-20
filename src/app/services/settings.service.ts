@@ -7,6 +7,7 @@ export interface Settings {
   dateFormat?: string;
   initialTransactionsLoaded?: number;
   refreshRateSeconds?: number;
+  maxTransactionRows?: number;
 }
 
 @Injectable({
@@ -20,6 +21,7 @@ export class SettingsService {
     dateFormat: undefined!,
     initialTransactionsLoaded: 20,
     refreshRateSeconds: 10,
+    maxTransactionRows: 1000,
   };
 
   private readonly _settings$ = new BehaviorSubject<Settings>({});
@@ -44,6 +46,11 @@ export class SettingsService {
       (settings) =>
         settings.refreshRateSeconds ?? this.defaults.refreshRateSeconds!
     ),
+    distinctUntilChanged()
+  );
+
+  public readonly maxTransactionRows$ = this._settings$.pipe(
+    map((settings) => settings.maxTransactionRows ?? this.defaults.maxTransactionRows!),
     distinctUntilChanged()
   );
 
