@@ -36,6 +36,8 @@ export class CategorySelectorComponent implements OnInit, OnDestroy {
   }
   private _selectedCategory?: string;
 
+  @Input() label = 'Category';
+
   @Output() selectedCategoryChange = new EventEmitter<Category>();
 
   @ViewChild('input') inputEl!: ElementRef<HTMLInputElement>;

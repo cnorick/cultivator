@@ -1,5 +1,5 @@
 <mat-form-field class="example-full-width" *ngIf="{filteredCategories: filteredCategories} as data">
-  <mat-label>Category</mat-label>
+  <mat-label>{{label}}</mat-label>
   <input type="text" placeholder="Pick one" matInput [matAutocomplete]="auto" [value]="selectedCategory"
     [formControl]="categoryCtl" (focus)="onInputFocus($event)" (keyup.enter)="onInputSubmit()" #input>
   <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onCategoryChange($event)" autoSelectActiveOption="true">
