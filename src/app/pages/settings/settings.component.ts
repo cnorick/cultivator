@@ -61,6 +61,14 @@ export class SettingsComponent implements OnDestroy {
       enable: () => this.onEnableSplit(),
       disable: () => this.onDisableSplit(),
     },
+    {
+      name: 'Transfers',
+      description:
+        'Adds the ability to create transfers between categories',
+      enabled$: this.featuresService.transfersEnabled$,
+      enable: () => this.featuresService.enableTransfersFeature(),
+      disable: () => this.featuresService.disableTransfersFeature(),
+    }
   ];
 
   constructor(

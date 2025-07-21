@@ -33,6 +33,13 @@ export class FeaturesService {
       startWith(null),
       shareReplay(1)
     );
+  
+  public readonly transfersEnabled$ = 
+    this.googleSheetsService.cultivatorGlobalDeveloperMetadataValue$.pipe(
+      map((metadata) => !!metadata?.transfersEnabled),
+      startWith(null),
+      shareReplay(1)
+    );
 
   public enableNotesFeature() {
     this.googleSheetsService.addNotesHeader();
@@ -59,6 +66,18 @@ export class FeaturesService {
   public disableSplitFeature() {
     this.googleSheetsService.updateGlobalMetadata({
       splitEnabled: false,
+    });
+  }
+
+  public disableTransfersFeature(): void {
+    this.googleSheetsService.updateGlobalMetadata({
+      transfersEnabled: false,
+    });
+  }
+
+  public enableTransfersFeature(): void {
+    this.googleSheetsService.updateGlobalMetadata({
+      transfersEnabled: true,
     });
   }
 }

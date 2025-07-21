@@ -24,6 +24,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { SplitComponent } from './more-info/split/split.component';
+import { NewTransferComponent } from './new-transfer/new-transfer.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { SplitComponent } from './more-info/split/split.component';
     CategorySelectorPageComponent,
     InfoContainerComponent,
     NotesComponent,
+    NewTransferComponent,
     NewTransactionComponent,
     SplitComponent,
   ],

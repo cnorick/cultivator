@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatChipSelectionChange } from '@angular/material/chips';
 import { ActivatedRoute, Router } from '@angular/router';
-import { take } from 'rxjs';
+import { combineLatest, map, take } from 'rxjs';
 import { FeaturesService } from 'src/app/services/features.service';
 import { LocalStorageService } from 'src/app/services/local-storage.service';
 import {
@@ -25,10 +25,10 @@ interface Filter {
 }
 
 @Component({
-    selector: 'app-transactions',
-    templateUrl: './transactions.component.html',
-    styleUrls: ['./transactions.component.scss'],
-    standalone: false
+  selector: 'app-transactions',
+  templateUrl: './transactions.component.html',
+  styleUrls: ['./transactions.component.scss'],
+  standalone: false,
 })
 export class TransactionsComponent {
   private static readonly FILTER_STORAGE_KEY = 'transaction_filters';
@@ -73,6 +73,15 @@ export class TransactionsComponent {
 
   transactions$ = this.transactionsService.shownTransactions$;
   manualTransactionsEnabled$ = this.featuresService.manualTransactionsEnabled$;
+  transfersEnabled$ = this.featuresService.transfersEnabled$;
+  showFab$ = combineLatest([
+    this.manualTransactionsEnabled$,
+    this.transfersEnabled$,
+  ]).pipe(
+    map(
+      ([manualEnabled, transfersEnabled]) => manualEnabled || transfersEnabled
+    )
+  );
 
   readonly allFilters: Filter[] = [
     {

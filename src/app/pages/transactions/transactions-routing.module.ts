@@ -15,6 +15,7 @@ import { NotesComponent } from './more-info/notes/notes.component';
 import { TransactionsComponent } from './transactions.component';
 import { NewTransactionComponent } from './new-transaction/new-transaction.component';
 import { SplitComponent } from './more-info/split/split.component';
+import { NewTransferComponent } from './new-transfer/new-transfer.component';
 
 const getTransactionTitleResolver =
   (append?: string) =>
@@ -47,6 +48,14 @@ const routes: Routes = [
       breadcrumb: 'New',
     },
     title: 'New Transaction',
+  },
+  {
+    path: 'transfer',
+    component: NewTransferComponent,
+    data: {
+      breadcrumb: 'New Transfer',
+    },
+    title: 'New Transfer',
   },
   {
     path: ':id',

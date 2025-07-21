@@ -66,7 +66,9 @@ export class TransactionsService {
         .filter(
           (t) =>
             searchTerm.trim() === '' ||
-            t.description?.toLowerCase().includes(searchTerm.toLowerCase().trim()) ||
+            t.description
+              ?.toLowerCase()
+              .includes(searchTerm.toLowerCase().trim()) ||
             t.full_description
               ?.toLowerCase()
               .includes(searchTerm.toLowerCase().trim()) ||
@@ -113,7 +115,10 @@ export class TransactionsService {
     return id;
   }
 
-  public splitTransaction(transaction: Transaction, splits: TransactionSplit[]) {
+  public splitTransaction(
+    transaction: Transaction,
+    splits: TransactionSplit[]
+  ) {
     const [firstSplit, ...restSplits] = splits;
 
     console.log('Splitting transaction', transaction, 'into', splits);
@@ -124,7 +129,7 @@ export class TransactionsService {
       category: firstSplit.category,
       amount: firstSplit.amount,
     });
-    
+
     // Create new transactions for the rest of the splits.
     const splitsData = restSplits.map((split) => ({
       ...convertTransactionToDataDict(transaction),
@@ -137,4 +142,46 @@ export class TransactionsService {
     this.googleSheets.addTransactionRows(splitsData, transaction.sheetsRow + 1);
   }
 
+  public createTransfer(config: {
+    from: Category;
+    to: Category;
+    amount: number;
+    date?: Date;
+    description?: string;
+    notes?: string;
+  }) {
+    const { from, to, amount, date = new Date(), description, notes } = config;
+
+    const fromTransaction: Partial<Transaction> = {
+      transaction_id: `${uuidv4()}-transfer`,
+      amount: -amount,
+      category: from.category,
+      date,
+      date_added: new Date(),
+      description: `Transfer from ${from.category} to ${to.category}`,
+      full_description: `${description || 'Transfer out'} from ${
+        from.category
+      }`,
+      account: 'manual',
+      institution: 'Manual Transaction',
+      ...(notes && { notes }),
+    };
+
+    const toTransaction: Partial<Transaction> = {
+      transaction_id: `${uuidv4()}-transfer`,
+      amount,
+      category: to.category,
+      date,
+      date_added: new Date(),
+      description: `Transfer from ${from.category} to ${to.category}`,
+      full_description: `${description || 'Transfer in'} to ${to.category}`,
+      account: 'manual',
+      institution: 'Manual Transaction',
+      ...(notes && { notes }),
+    };
+
+    this.googleSheets.addTransactionRows(
+      [fromTransaction, toTransaction].map(convertTransactionToDataDict)
+    );
+  }
 }

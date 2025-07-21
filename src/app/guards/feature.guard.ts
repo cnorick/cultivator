@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { map, skipWhile } from 'rxjs';
 import { FeaturesService } from '../services/features.service';
 
-const supportedFeatures = ['notes', 'split'] as const;
+const supportedFeatures = ['notes', 'split', 'transfer'] as const;
 type SupportedFeature = typeof supportedFeatures[number];
 
 export const featureGuard = (feature: SupportedFeature) => () => {
@@ -31,6 +31,18 @@ export const featureGuard = (feature: SupportedFeature) => () => {
         map((enabled) => {
           if (!enabled) {
             snackbar.open('Split not enabled.');
+            return router.createUrlTree(['/settings']);
+          } else return true;
+        })
+      );
+    }
+
+    case 'transfer': {
+      return featuresService.transfersEnabled$.pipe(
+        skipWhile((val) => val === null),
+        map((enabled) => {
+          if (!enabled) {
+            snackbar.open('Transfers not enabled.');
             return router.createUrlTree(['/settings']);
           } else return true;
         })

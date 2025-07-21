@@ -24,9 +24,12 @@
   </ng-container>
 </ng-container>
 
-<app-fab *ngIf="manualTransactionsEnabled$ | async">
-  <a routerLink="./new" title="Add Manual Transaction" mat-fab color="primary">
+<app-fab *ngIf="showFab$ | async">
+  <a fab-option routerLink="./new" title="Add Manual Transaction" mat-mini-fab>
     <mat-icon>add</mat-icon>
+  </a>
+  <a fab-option routerLink="./transfer" title="Add Transfer" mat-mini-fab *ngIf="transfersEnabled$ | async">
+    <mat-icon>swap_horiz</mat-icon>
   </a>
 </app-fab>
 

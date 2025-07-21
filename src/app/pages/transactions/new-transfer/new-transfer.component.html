@@ -1,0 +1,30 @@
+<h1>New Transfer</h1>
+<form [formGroup]="newTransferForm" (ngSubmit)="onSubmit()" class="form-container">
+  <mat-form-field>
+    <mat-label>Amount</mat-label>
+    <input matInput formControlName="amount">
+    <mat-error *ngIf="amount?.errors?.['min']">Must be a positive number.</mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Transaction Date
+    </mat-label>
+    <input matInput [matDatepicker]="picker" formControlName="date">
+    <mat-hint>MM/DD/YYYY</mat-hint>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+
+  <app-category-selector label="From Category" [selectedCategory]="newTransferForm.value.from?.category"
+    (selectedCategoryChange)="newTransferForm.controls.from.setValue($event)"></app-category-selector>
+
+  <app-category-selector label="To Category" [selectedCategory]="newTransferForm.value.to?.category"
+    (selectedCategoryChange)="newTransferForm.controls.to.setValue($event)"></app-category-selector>
+
+  <mat-form-field>
+    <mat-label>Notes:</mat-label>
+    <textarea matInput type="textarea" formControlName="notes"></textarea>
+  </mat-form-field>
+
+  <button color="primary" mat-flat-button type="submit" [disabled]="!newTransferForm.valid">Create</button>
+</form>
