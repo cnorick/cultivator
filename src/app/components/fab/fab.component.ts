@@ -7,8 +7,16 @@ import { Component, HostListener } from '@angular/core';
     standalone: false
 })
 export class FabComponent {
-  // @HostListener('window:scroll', ['$event']) // for window scroll events
-  // onScroll(event: Event) {
-  //   console.log(event);
-  // }
+  public isExpanded = false;
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (target.closest('.fab-main')) {
+      this.isExpanded = !this.isExpanded;
+    }
+    else {
+      this.isExpanded = false;
+    }
+  }
 }

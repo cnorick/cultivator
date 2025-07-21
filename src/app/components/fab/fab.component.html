@@ -1,3 +1,15 @@
 <div class="fab-container">
-  <ng-content></ng-content>
+  <div class="fab-mini-container" *ngIf="isExpanded">
+    <ng-content select="[fab-option]"></ng-content>
+  </div>
+  <button mat-fab class="fab-main" color="primary">
+    @switch (isExpanded) {
+      @case (true) {
+        <mat-icon>close</mat-icon>
+      }
+      @default {
+        <mat-icon>menu</mat-icon>
+      }
+    }
+  </button>
 </div>
