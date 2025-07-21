@@ -56,6 +56,7 @@ const routes: Routes = [
       breadcrumb: 'New Transfer',
     },
     title: 'New Transfer',
+    canActivate: [featureGuard('transfer')],
   },
   {
     path: ':id',
