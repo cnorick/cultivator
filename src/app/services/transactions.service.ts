@@ -126,17 +126,15 @@ export class TransactionsService {
     });
     
     // Create new transactions for the rest of the splits.
-    for (const split of restSplits) {
-      const id = `${uuidv4()}-split`;
-      const dataDict = {
-        ...convertTransactionToDataDict(transaction),
-        transaction_id: id,
-        category: split.category,
-        amount: split.amount,
-        sheetsRow: null
-      };
+    const splitsData = restSplits.map((split) => ({
+      ...convertTransactionToDataDict(transaction),
+      transaction_id: `${uuidv4()}-split`,
+      category: split.category,
+      amount: split.amount,
+      sheetsRow: null,
+    }));
 
-      this.googleSheets.addTransactionRow(dataDict, transaction.sheetsRow + 1);
-    }
+    this.googleSheets.addTransactionRows(splitsData, transaction.sheetsRow + 1);
   }
+
 }

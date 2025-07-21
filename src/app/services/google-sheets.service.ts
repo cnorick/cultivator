@@ -36,8 +36,8 @@ export class GoogleSheetsService {
     transaction: any;
   }>();
 
-  private onAppendTransaction$ = new Subject<{
-    transaction: any;
+  private onAppendTransactions$ = new Subject<{
+    transactions: any[];
     rowNum?: number;
   }>();
 
@@ -197,17 +197,17 @@ export class GoogleSheetsService {
     shareReplay()
   );
 
-  private readonly doAppendTransaction$ = this.onAppendTransaction$.pipe(
+  private readonly doAppendTransaction$ = this.onAppendTransactions$.pipe(
     withLatestFrom(
       this.transactionHeaders$,
       this.transactionSheetTitle$,
       this.spreadsheetId$
     ),
-    switchMap(([{ transaction, rowNum }, headers, title, id]) => {
-      const data = headers.map((h) => transaction[normalizeHeader(h)]);
+    switchMap(([{ transactions, rowNum }, headers, title, id]) => {
+      const data = transactions.map(t => headers.map((h) => t[normalizeHeader(h)]));
 
       // Append after rowNum if provided, otherwise append to the top of the sheet after the headers.
-      return this.googleClient.appendRow(id!, title, rowNum ?? 3, data);
+      return this.googleClient.appendRows(id!, title, rowNum ?? 3, data);
     })
   );
 
@@ -323,7 +323,11 @@ export class GoogleSheetsService {
   }
 
   public addTransactionRow(transaction: any, rowNum?: number) {
-    this.onAppendTransaction$.next({ transaction, rowNum });
+    this.onAppendTransactions$.next({ transactions: [transaction], rowNum });
+  }
+
+  public addTransactionRows(transactions: any[], rowNum?: number) {
+    this.onAppendTransactions$.next({ transactions, rowNum });
   }
 
   public addNotesHeader() {
