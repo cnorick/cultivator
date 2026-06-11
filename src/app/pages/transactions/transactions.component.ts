@@ -34,6 +34,7 @@ export class TransactionsComponent {
   private static readonly FILTER_STORAGE_KEY = 'transaction_filters';
 
   searchControl = new FormControl<string>('');
+  searchExpanded = false;
 
   constructor(
     private transactionsService: TransactionsService,
@@ -42,6 +43,10 @@ export class TransactionsComponent {
     private localStorage: LocalStorageService,
     private featuresService: FeaturesService
   ) {
+    const initialSearch = this.transactionsService.getSearch();
+    this.searchControl.setValue(initialSearch);
+    this.searchExpanded = !!initialSearch;
+
     activatedRoute.queryParamMap.pipe(take(1)).subscribe((queryParams) => {
       // Check the query params first and use those filters if there are some. Otherwise, use the stored ones.
       let filterNames = queryParams.get('filters')?.split(',') ?? [];

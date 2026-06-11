@@ -90,6 +90,10 @@ export class TransactionsService {
     this.searchTerm$.next(search);
   }
 
+  public getSearch(): string {
+    return this.searchTerm$.getValue();
+  }
+
   public updateCategory(transaction: Transaction, category: Category) {
     const dataDict = { ...transaction.original, category: category.category };
 

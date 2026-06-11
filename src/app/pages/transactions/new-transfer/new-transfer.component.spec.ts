@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NewTransactionComponent } from './new-transfer.component';
+import { NewTransferComponent } from './new-transfer.component';
 
-describe('NewTransactionComponent', () => {
-  let component: NewTransactionComponent;
-  let fixture: ComponentFixture<NewTransactionComponent>;
+describe('NewTransferComponent', () => {
+  let component: NewTransferComponent;
+  let fixture: ComponentFixture<NewTransferComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [NewTransactionComponent]
+      declarations: [NewTransferComponent]
     });
-    fixture = TestBed.createComponent(NewTransactionComponent);
+    fixture = TestBed.createComponent(NewTransferComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

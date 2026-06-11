@@ -4,7 +4,7 @@
       (selectionChange)="onFilterChange($event, filter, allFilters)">
       {{filter.name}}</mat-chip-option>
   </mat-chip-listbox>
-<mat-expansion-panel>
+<mat-expansion-panel [expanded]="searchExpanded">
   <mat-expansion-panel-header>
     <mat-panel-title>Search</mat-panel-title>
   </mat-expansion-panel-header>
