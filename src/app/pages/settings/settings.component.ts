@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map, Observable, Subject, takeUntil } from 'rxjs';
@@ -21,6 +21,10 @@ interface Feature {
 })
 export class SettingsComponent implements OnDestroy {
   private destroy$ = new Subject<void>();
+  private settingsService = inject(SettingsService);
+  private activatedRoute = inject(ActivatedRoute);
+  private router = inject(Router);
+  private featuresService = inject(FeaturesService);
 
   settingsForm = new FormGroup({
     spreadsheetId: new FormControl({ value: '', disabled: false }),
@@ -71,13 +75,8 @@ export class SettingsComponent implements OnDestroy {
     }
   ];
 
-  constructor(
-    private settingsService: SettingsService,
-    activatedRoute: ActivatedRoute,
-    router: Router,
-    private featuresService: FeaturesService
-  ) {
-    settingsService.settings$
+  constructor() {
+    this.settingsService.settings$
       .pipe(takeUntil(this.settingsForm.valueChanges))
       .subscribe((settings) =>
         this.settingsForm.setValue({
@@ -91,16 +90,16 @@ export class SettingsComponent implements OnDestroy {
 
     this.settingsForm.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe((settings) => settingsService.updateSettings(settings as any));
+      .subscribe((settings) => this.settingsService.updateSettings(settings as any));
 
-    activatedRoute.queryParamMap
+    this.activatedRoute.queryParamMap
       .pipe(takeUntil(this.destroy$))
       .subscribe((params) => {
         const docId = params.get('docId');
         if (docId) {
           this.settingsForm.patchValue({ spreadsheetId: docId });
-          router.navigate([], {
-            relativeTo: activatedRoute,
+          this.router.navigate([], {
+            relativeTo: this.activatedRoute,
             queryParams: { docId: undefined },
             queryParamsHandling: 'merge',
           });

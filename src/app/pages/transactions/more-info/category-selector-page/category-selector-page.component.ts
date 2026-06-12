@@ -23,7 +23,9 @@ export class CategorySelectorPageComponent implements AfterViewInit {
   ) {}
 
   ngAfterViewInit(): void {
-    this.categorySelector.focus();
+    if (this.categorySelector) {
+      this.categorySelector.focus();
+    }
   }
 
   transaction$ = combineLatest([

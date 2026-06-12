@@ -36,6 +36,10 @@ jobs:
         with:
           node-version-file: .nvmrc
       - run: npm install
+
+      - name: Run tests
+        run: npm run test -- --no-watch --browsers=ChromeHeadless
+
       - run: npm run build
 
       - name: S3 Sync

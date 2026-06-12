@@ -49,8 +49,10 @@ export class NotesComponent implements AfterViewInit {
   );
 
   focus(): void {
-    this.inputEl.nativeElement.focus({ preventScroll: true });
-    this.cdr.detectChanges();
+    if (this.inputEl) {
+      this.inputEl.nativeElement.focus({ preventScroll: true });
+      this.cdr.detectChanges();
+    }
   }
 
   onNotesChange(event: Event, transaction: Transaction) {

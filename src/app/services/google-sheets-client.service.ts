@@ -119,7 +119,7 @@ export class GoogleSheetsClientService {
   }
 
   public getSheetIdFromUrl(url?: string) {
-    return url?.match(/#gid=(\d)*/)?.[1];
+    return url?.match(/#gid=(\d+)/)?.[1];
   }
 
   /**
