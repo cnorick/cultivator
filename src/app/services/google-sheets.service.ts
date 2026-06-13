@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import {
   combineLatest,
+  catchError,
   filter,
+  first,
   map,
   switchMap,
   withLatestFrom,
@@ -15,15 +17,35 @@ import {
   distinctUntilChanged,
   delay,
   share,
+  concatMap,
+  Observable,
+  EMPTY,
+  debounceTime,
+  timer,
 } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { GoogleSheetsClientService } from './google-sheets-client.service';
 import { convertTableToDictArray, normalizeHeader } from '../utils/table-utils';
 import { SettingsService } from './settings.service';
 import { GoogleAuthService } from './google-auth.service';
-import { refreshMap } from '../utils/refresh-operator';
+import { refreshMap, pauseWhen } from '../utils/refresh-operator';
 import { LogService } from './log.service';
 import { NOTES_HEADER } from './features.service';
 import { CultivatorMetadata } from '../types/cultivator-metadata';
+
+/** Discriminated union of all write operations. */
+type WriteOperation =
+  | { type: 'updateTransaction'; row: number; transaction: any }
+  | { type: 'appendTransactions'; transactions: any[]; rowNum?: number }
+  | { type: 'addTransactionHeader'; header: string | number }
+  | { type: 'updateGlobalMetadata'; metadata: Partial<CultivatorMetadata> }
+  | { type: 'deleteGlobalMetadata' };
+
+/** Tracks which kinds of refresh are needed after a batch of writes. */
+type RefreshType = 'transaction' | 'full';
+
+/** Maximum number of retry attempts for a failed write. */
+const WRITE_RETRY_COUNT = 3;
 
 @Injectable({
   providedIn: 'root',
@@ -31,29 +53,30 @@ import { CultivatorMetadata } from '../types/cultivator-metadata';
 export class GoogleSheetsService {
   private static readonly METADATA_KEY = 'cultivator';
 
-  private onUpdateTransaction$ = new Subject<{
-    row: number;
-    transaction: any;
-  }>();
+  // --- Write queue ---
 
-  private onAppendTransactions$ = new Subject<{
-    transactions: any[];
-    rowNum?: number;
-  }>();
+  private readonly writeQueue$ = new Subject<WriteOperation>();
 
-  private onAddTransactionHeader$ = new Subject<{
-    header: string | number;
-  }>();
+  /**
+   * Tracks whether writes are currently in-flight.
+   * Used to suppress polling and debounce refreshes.
+   */
+  private readonly _isWriting$ = new BehaviorSubject<boolean>(false);
 
-  private onUpdateGlobalMetadata$ = new Subject<Partial<CultivatorMetadata>>();
+  /**
+   * Accumulates which refresh types are needed during a write batch.
+   * Reset when the debounced refresh fires.
+   */
+  private pendingRefreshTypes = new Set<RefreshType>();
 
-  private onDeleteGlobalMetadata$ = new Subject<void>();
+  // --- Triggers ---
 
   private triggerTransactionRefresh$ = new Subject<void>();
-
   private triggerFullRefresh$ = new Subject<void>();
 
   private _isOnline = new BehaviorSubject<boolean>(true);
+
+  // --- Derived streams ---
 
   private readonly spreadsheetId$ = this.settings.spreadsheetId$;
 
@@ -78,7 +101,7 @@ export class GoogleSheetsService {
     this.allSheetsResponse$.pipe(
       map((res) => res.developerMetadata as any[]),
       map((metadataArr) =>
-        metadataArr.find(
+        metadataArr?.find(
           (m) => m.metadataKey === GoogleSheetsService.METADATA_KEY
         )
       ),
@@ -100,11 +123,11 @@ export class GoogleSheetsService {
         )
       )
     ),
-    shareReplay()
+    shareReplay({ bufferSize: 1, refCount: true })
   );
 
   private readonly transactionSheetTitle$ = this.transactionsSheetInfo$.pipe(
-    map((info) => info.properties.title as string)
+    map((info) => info!.properties.title as string)
   );
 
   private readonly categorySheetInfo$ = this.allSheetsResponse$.pipe(
@@ -128,6 +151,7 @@ export class GoogleSheetsService {
         this.triggerTransactionRefresh$.pipe(startWith('')),
         this.settings.maxTransactionRows$,
       ]).pipe(
+        pauseWhen(this._isWriting$.asObservable()),
         withLatestFrom(this.spreadsheetId$),
         refreshMap(([[title, _, maxTransactionRows], id]) => {
           // If 0 or nullish, get all rows. Otherwise, limit to the specified number of rows.
@@ -155,20 +179,20 @@ export class GoogleSheetsService {
         return of(error).pipe(delay(delayMs));
       },
     }),
-    shareReplay()
+    shareReplay({ bufferSize: 1, refCount: true })
   );
 
   private readonly categoryValuesRes$ = this.categorySheetInfo$.pipe(
     withLatestFrom(this.spreadsheetId$),
     switchMap(([info, id]) =>
-      this.googleClient.getSpreadsheetValues(id!, info.properties.title)
+      this.googleClient.getSpreadsheetValues(id!, info!.properties.title)
     ),
-    shareReplay()
+    shareReplay({ bufferSize: 1, refCount: true })
   );
 
   public readonly transactionHeaders$ = this.transactionValuesRes$.pipe(
     map((res) => res.values[0] as (string | number)[]),
-    shareReplay()
+    shareReplay({ bufferSize: 1, refCount: true })
   );
 
   private readonly transactionRows$ = this.transactionValuesRes$.pipe(
@@ -184,89 +208,6 @@ export class GoogleSheetsService {
     map((res) => res.values.slice(1))
   );
 
-  private readonly doUpdateTransaction$ = this.onUpdateTransaction$.pipe(
-    withLatestFrom(
-      this.transactionHeaders$,
-      this.transactionSheetTitle$,
-      this.spreadsheetId$
-    ),
-    switchMap(([{ transaction, row }, headers, title, id]) => {
-      const data = headers.map((h) => transaction[normalizeHeader(h)]);
-      return this.googleClient.updateRow(id!, title, row, data);
-    }),
-    shareReplay()
-  );
-
-  private readonly doAppendTransaction$ = this.onAppendTransactions$.pipe(
-    withLatestFrom(
-      this.transactionHeaders$,
-      this.transactionSheetTitle$,
-      this.spreadsheetId$
-    ),
-    switchMap(([{ transactions, rowNum }, headers, title, id]) => {
-      const data = transactions.map(t => headers.map((h) => t[normalizeHeader(h)]));
-
-      // Append after rowNum if provided, otherwise append to the top of the sheet after the headers.
-      return this.googleClient.appendRows(id!, title, rowNum ?? 3, data);
-    })
-  );
-
-  private readonly doAddTransactionHeader$ = this.onAddTransactionHeader$.pipe(
-    withLatestFrom(
-      this.transactionHeaders$,
-      this.transactionSheetTitle$,
-      this.spreadsheetId$
-    ),
-    switchMap(([{ header }, existingHeaders, title, id]) => {
-      const headerAlreadyExists = existingHeaders.some(
-        (existingHeader) =>
-          existingHeader.toString().toLowerCase() ===
-          header.toString().toLowerCase()
-      );
-      if (headerAlreadyExists) {
-        return of(null);
-      }
-
-      const updatedHeaders = [...existingHeaders, header];
-      return this.googleClient.updateRow(id!, title, 1, updatedHeaders);
-    })
-  );
-
-  private readonly doUpdateGlobalMetadata$ = this.onUpdateGlobalMetadata$.pipe(
-    withLatestFrom(
-      this.cultivatorGlobalDeveloperMetadataValue$,
-      this.spreadsheetId$
-    ),
-    switchMap(([newMetadata, existingMetadata, spreadsheetId]) => {
-      if (!existingMetadata) {
-        return this.googleClient.addGlobalMetadata(
-          spreadsheetId!,
-          GoogleSheetsService.METADATA_KEY,
-          JSON.stringify(newMetadata),
-          'DOCUMENT'
-        );
-      } else {
-        const updatedMetadata = { ...existingMetadata, ...newMetadata };
-        return this.googleClient.updateGlobalMetadata(
-          spreadsheetId!,
-          GoogleSheetsService.METADATA_KEY,
-          JSON.stringify(updatedMetadata),
-          'DOCUMENT'
-        );
-      }
-    })
-  );
-
-  private readonly doDeleteGlobalMetadata$ = this.onDeleteGlobalMetadata$.pipe(
-    withLatestFrom(this.spreadsheetId$),
-    switchMap(([_, spreadsheetId]) =>
-      this.googleClient.deleteGlobalMetadata(
-        spreadsheetId!,
-        GoogleSheetsService.METADATA_KEY
-      )
-    )
-  );
-
   public readonly transactionData$ = combineLatest([
     this.transactionHeaders$,
     this.transactionRows$,
@@ -277,12 +218,123 @@ export class GoogleSheetsService {
     this.categoryRows$,
   ]).pipe(map(([headers, rows]) => convertTableToDictArray(headers, rows)));
 
+  // --- Write queue processing ---
+
+  /**
+   * Executes a single write operation, returning the appropriate refresh type.
+   * Uses `withLatestFrom` to grab current headers/title/id at execution time.
+   */
+  private executeWrite(op: WriteOperation): Observable<RefreshType> {
+    switch (op.type) {
+      case 'updateTransaction':
+        return combineLatest([
+          this.transactionHeaders$,
+          this.transactionSheetTitle$,
+          this.spreadsheetId$,
+        ]).pipe(
+          first(),
+          switchMap(([headers, title, id]) => {
+            const data = headers.map(
+              (h) => op.transaction[normalizeHeader(h)]
+            );
+            return this.googleClient.updateRow(id!, title, op.row, data);
+          }),
+          map(() => 'transaction' as RefreshType)
+        );
+
+      case 'appendTransactions':
+        return combineLatest([
+          this.transactionHeaders$,
+          this.transactionSheetTitle$,
+          this.spreadsheetId$,
+        ]).pipe(
+          first(),
+          switchMap(([headers, title, id]) => {
+            const data = op.transactions.map((t) =>
+              headers.map((h) => t[normalizeHeader(h)])
+            );
+            // Append after rowNum if provided, otherwise append to the top of the sheet after the headers.
+            return this.googleClient.appendRows(
+              id!,
+              title,
+              op.rowNum ?? 3,
+              data
+            );
+          }),
+          map(() => 'transaction' as RefreshType)
+        );
+
+      case 'addTransactionHeader':
+        return combineLatest([
+          this.transactionHeaders$,
+          this.transactionSheetTitle$,
+          this.spreadsheetId$,
+        ]).pipe(
+          first(),
+          switchMap(([existingHeaders, title, id]) => {
+            const headerAlreadyExists = existingHeaders.some(
+              (existingHeader) =>
+                existingHeader.toString().toLowerCase() ===
+                op.header.toString().toLowerCase()
+            );
+            if (headerAlreadyExists) {
+              return of(null);
+            }
+            const updatedHeaders = [...existingHeaders, op.header];
+            return this.googleClient.updateRow(id!, title, 1, updatedHeaders);
+          }),
+          map(() => 'transaction' as RefreshType)
+        );
+
+      case 'updateGlobalMetadata':
+        return combineLatest([
+          this.cultivatorGlobalDeveloperMetadataValue$,
+          this.spreadsheetId$,
+        ]).pipe(
+          first(),
+          switchMap(([existingMetadata, spreadsheetId]) => {
+            if (!existingMetadata) {
+              return this.googleClient.addGlobalMetadata(
+                spreadsheetId!,
+                GoogleSheetsService.METADATA_KEY,
+                JSON.stringify(op.metadata),
+                'DOCUMENT'
+              );
+            } else {
+              const updatedMetadata = { ...existingMetadata, ...op.metadata };
+              return this.googleClient.updateGlobalMetadata(
+                spreadsheetId!,
+                GoogleSheetsService.METADATA_KEY,
+                JSON.stringify(updatedMetadata),
+                'DOCUMENT'
+              );
+            }
+          }),
+          map(() => 'full' as RefreshType)
+        );
+
+      case 'deleteGlobalMetadata':
+        return this.spreadsheetId$.pipe(
+          first(),
+          switchMap((spreadsheetId) =>
+            this.googleClient.deleteGlobalMetadata(
+              spreadsheetId!,
+              GoogleSheetsService.METADATA_KEY
+            )
+          ),
+          map(() => 'full' as RefreshType)
+        );
+    }
+  }
+
   constructor(
     private googleClient: GoogleSheetsClientService,
     private settings: SettingsService,
     private auth: GoogleAuthService,
+    private snackbar: MatSnackBar,
     logger: LogService
   ) {
+    // --- Logging subscriptions ---
     this.allSheetsResponse$.subscribe((res) => logger.log(res));
     this.transactionsSheetInfo$.subscribe((res) => logger.log(res));
     this.transactionValuesRes$.subscribe((res) => logger.log(res));
@@ -290,55 +342,115 @@ export class GoogleSheetsService {
     this.categorySheetInfo$.subscribe((res) => logger.log(res));
     this.categoryValuesRes$.subscribe((res) => logger.log(res));
     this.categoryData$.subscribe((res) => logger.log(res));
-    this.doUpdateTransaction$.subscribe((res) => logger.log(res));
-    this.doAddTransactionHeader$.subscribe((res) => logger.log(res));
     this.cultivatorGlobalDeveloperMetadataValue$.subscribe((res) =>
       logger.log(res)
     );
 
-    this.doUpdateTransaction$.subscribe(() => {
-      this.triggerTransactionRefresh$.next();
-    });
+    // --- Serialized write queue ---
+    this.writeQueue$
+      .pipe(
+        concatMap((op) => {
+          this._isWriting$.next(true);
+          return this.executeWrite(op).pipe(
+            retry({
+              count: WRITE_RETRY_COUNT,
+              delay: (error, retryCount) => {
+                const delayMs = Math.min(
+                  Math.pow(2, retryCount) * 1000,
+                  8000
+                );
+                logger.log(
+                  `Write retry ${retryCount}/${WRITE_RETRY_COUNT} for ${op.type}, waiting ${delayMs}ms`
+                );
+                return timer(delayMs);
+              },
+            }),
+            tap({
+              next: (refreshType) => {
+                this.pendingRefreshTypes.add(refreshType);
+              },
+              error: (err) => {
+                logger.error(`Write failed after ${WRITE_RETRY_COUNT} retries: ${op.type}`);
+                logger.error(err);
+                this.snackbar.open(
+                  'Failed to save changes. Please refresh and try again.',
+                  'Dismiss',
+                  { duration: 10_000 }
+                );
+              },
+            }),
+            // Catch errors so the concatMap chain doesn't break.
+            // Failed writes should not block subsequent queued writes.
+            catchError(() => EMPTY)
+          );
+        })
+      )
+      .subscribe({
+        next: () => {
+          // After each write completes, check if the queue has drained.
+          // We do this by briefly marking isWriting as false, then the
+          // debounced refresh subscription will fire if no more writes arrive.
+          this._isWriting$.next(false);
+        },
+      });
 
-    this.doAppendTransaction$.subscribe(() => {
-      this.triggerTransactionRefresh$.next();
-    });
+    // --- Debounced refresh after queue drains ---
+    this._isWriting$
+      .pipe(
+        // Debounce to wait for the queue to truly drain.
+        // If another write arrives within 300ms, the refresh is delayed.
+        debounceTime(300),
+        filter((isWriting) => !isWriting),
+        // Only fire if there are actually pending refreshes.
+        filter(() => this.pendingRefreshTypes.size > 0)
+      )
+      .subscribe(() => {
+        const types = new Set(this.pendingRefreshTypes);
+        this.pendingRefreshTypes.clear();
 
-    this.doAddTransactionHeader$.subscribe(() => {
-      this.triggerTransactionRefresh$.next();
-    });
-
-    this.doUpdateGlobalMetadata$.subscribe(() => {
-      this.triggerFullRefresh$.next();
-    });
-
-    this.doDeleteGlobalMetadata$.subscribe(() => {
-      this.triggerFullRefresh$.next();
-    });
+        if (types.has('full')) {
+          this.triggerFullRefresh$.next();
+        } else if (types.has('transaction')) {
+          this.triggerTransactionRefresh$.next();
+        }
+      });
   }
+
+  // --- Public API (unchanged signatures) ---
 
   public updateTransactionsRow(row: number, transaction: any) {
     console.log(transaction);
-    this.onUpdateTransaction$.next({ row, transaction });
+    this.writeQueue$.next({ type: 'updateTransaction', row, transaction });
   }
 
   public addTransactionRow(transaction: any, rowNum?: number) {
-    this.onAppendTransactions$.next({ transactions: [transaction], rowNum });
+    this.writeQueue$.next({
+      type: 'appendTransactions',
+      transactions: [transaction],
+      rowNum,
+    });
   }
 
   public addTransactionRows(transactions: any[], rowNum?: number) {
-    this.onAppendTransactions$.next({ transactions, rowNum });
+    this.writeQueue$.next({
+      type: 'appendTransactions',
+      transactions,
+      rowNum,
+    });
   }
 
   public addNotesHeader() {
-    this.onAddTransactionHeader$.next({ header: NOTES_HEADER });
+    this.writeQueue$.next({
+      type: 'addTransactionHeader',
+      header: NOTES_HEADER,
+    });
   }
 
   public updateGlobalMetadata(metadata: Partial<CultivatorMetadata>) {
-    this.onUpdateGlobalMetadata$.next(metadata);
+    this.writeQueue$.next({ type: 'updateGlobalMetadata', metadata });
   }
 
   deleteMetadata() {
-    this.onDeleteGlobalMetadata$.next();
+    this.writeQueue$.next({ type: 'deleteGlobalMetadata' });
   }
 }

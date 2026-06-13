@@ -83,4 +83,52 @@ describe('GoogleSheetsClientService', () => {
     expect(service.getSpreadsheetIdFromUrl(url)).toBe('1A2B3C4D5E');
     expect(service.getSheetIdFromUrl(url)).toBe('9876');
   });
+
+  it('should use the freshest token at request time (reactive token)', () => {
+    // Update token after service creation
+    accessToken$.next('updated-token');
+
+    service.getAllSheets('sheet-id-456').subscribe();
+
+    const req = httpMock.expectOne('https://sheets.googleapis.com/v4/spreadsheets/sheet-id-456');
+    expect(req.request.headers.get('Authorization')).toBe('Bearer updated-token');
+    req.flush({});
+  });
+
+  it('should error if access token is undefined', () => {
+    accessToken$.next(undefined);
+
+    let errorThrown = false;
+    service.getAllSheets('sheet-id-789').subscribe({
+      error: (err) => {
+        errorThrown = true;
+        expect(err.message).toBe('Not logged into Google.');
+      },
+    });
+
+    expect(errorThrown).toBe(true);
+  });
+
+  it('should make PUT requests for updateRow', () => {
+    service.updateRow('sheet-123', 'Transactions', 2, ['val1', 'val2']).subscribe();
+
+    const req = httpMock.expectOne(
+      'https://sheets.googleapis.com/v4/spreadsheets/sheet-123/values/Transactions!2:2?valueInputOption=RAW'
+    );
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.headers.get('Authorization')).toBe('Bearer fake-token');
+    expect(req.request.body).toEqual({ values: [['val1', 'val2']] });
+    req.flush({});
+  });
+
+  it('should make POST requests for appendRows', () => {
+    service.appendRows('sheet-123', 'Transactions', 3, [['v1', 'v2']]).subscribe();
+
+    const req = httpMock.expectOne(
+      'https://sheets.googleapis.com/v4/spreadsheets/sheet-123/values/Transactions!A3:A3:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS'
+    );
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({ values: [['v1', 'v2']] });
+    req.flush({});
+  });
 });

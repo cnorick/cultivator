@@ -60,7 +60,7 @@ export const refreshMap = <T, R>(
 
 // Ignore source emissions while the value in the provided stream is true.
 export const pauseWhen =
-  (pause$: Observable<boolean>) => (source$: Observable<unknown>) =>
+  <T>(pause$: Observable<boolean>) => (source$: Observable<T>) =>
     combineLatest([pause$.pipe(startWith(false)), source$]).pipe(
       filter(([pause, sourceVal]) => !pause),
       map(([pause, sourceVal]) => sourceVal)
