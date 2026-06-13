@@ -37,10 +37,14 @@ jobs:
           node-version-file: .nvmrc
       - run: npm install
 
+      - name: Run linter
+        run: npm run lint
+
       - name: Run tests
         run: npm run test -- --no-watch --browsers=ChromeHeadless
 
-      - run: npm run build
+      - name: Build
+        run: npm run build
 
       - name: S3 Sync
         uses: jakejarvis/s3-sync-action@v0.5.1
