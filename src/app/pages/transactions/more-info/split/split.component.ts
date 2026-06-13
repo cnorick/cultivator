@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -22,6 +22,10 @@ import { areFloatsEqual } from 'src/app/utils/float-utils';
   standalone: false,
 })
 export class SplitComponent {
+  private transactionsService = inject(TransactionsService);
+  private activatedRoute = inject(ActivatedRoute);
+  private router = inject(Router);
+
   readonly transaction$ = combineLatest([
     this.activatedRoute.parent!.paramMap,
     this.transactionsService.transactions$,
@@ -39,8 +43,8 @@ export class SplitComponent {
   );
 
   transaction: Transaction | null = null;
-  totalAmount: number = 0;
-  amountPositive: boolean = true;
+  totalAmount = 0;
+  amountPositive = true;
 
   get splits(): TransactionSplit[] {
     return this.splitsFormArray.controls.map((control) => control.value);
@@ -50,11 +54,7 @@ export class SplitComponent {
     return this.splitsForm.get('splits') as FormArray;
   }
 
-  constructor(
-    private transactionsService: TransactionsService,
-    private activatedRoute: ActivatedRoute,
-    private router: Router
-  ) {
+  constructor() {
     this.transaction$.pipe(skipWhile(t => !t), take(1)).subscribe((transaction) => {
       if (transaction) {
         this.transaction = transaction;

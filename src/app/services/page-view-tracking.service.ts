@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
 
@@ -12,7 +12,10 @@ declare global {
   providedIn: 'root',
 })
 export class PageViewTrackingService {
-  constructor(private router: Router, private activeRoute: ActivatedRoute) {
+  private router = inject(Router);
+  private activeRoute = inject(ActivatedRoute);
+
+  constructor() {
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),

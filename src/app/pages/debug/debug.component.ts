@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { GoogleSheetsService } from 'src/app/services/google-sheets.service';
 import { LogService } from 'src/app/services/log.service';
 
@@ -9,10 +9,9 @@ import { LogService } from 'src/app/services/log.service';
     standalone: false
 })
 export class DebugComponent {
-  constructor(
-    private logger: LogService,
-    private sheetsService: GoogleSheetsService
-  ) {}
+  private logger = inject(LogService);
+  private sheetsService = inject(GoogleSheetsService);
+
 
   onDownloadLogsClick() {
     this.logger.downloadLogs();

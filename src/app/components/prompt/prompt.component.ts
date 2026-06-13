@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   MatBottomSheetRef,
   MAT_BOTTOM_SHEET_DATA,
@@ -11,11 +11,12 @@ import {
     standalone: false
 })
 export class PromptComponent {
-  constructor(
-    @Inject(MAT_BOTTOM_SHEET_DATA)
-    public data: { mobileType: 'ios' | 'android'; promptEvent?: any },
-    private bottomSheetRef: MatBottomSheetRef<PromptComponent>
-  ) {}
+  data = inject<{
+    mobileType: 'ios' | 'android';
+    promptEvent?: any;
+}>(MAT_BOTTOM_SHEET_DATA);
+  private bottomSheetRef = inject<MatBottomSheetRef<PromptComponent>>(MatBottomSheetRef);
+
 
   public installPwa(): void {
     this.data.promptEvent.prompt();

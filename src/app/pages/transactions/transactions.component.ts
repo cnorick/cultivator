@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatChipSelectionChange } from '@angular/material/chips';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -31,18 +31,20 @@ interface Filter {
   standalone: false,
 })
 export class TransactionsComponent {
+  private transactionsService = inject(TransactionsService);
+  private router = inject(Router);
+  private activatedRoute = inject(ActivatedRoute);
+  private localStorage = inject(LocalStorageService);
+  private featuresService = inject(FeaturesService);
+
   private static readonly FILTER_STORAGE_KEY = 'transaction_filters';
 
   searchControl = new FormControl<string>('');
   searchExpanded = false;
 
-  constructor(
-    private transactionsService: TransactionsService,
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private localStorage: LocalStorageService,
-    private featuresService: FeaturesService
-  ) {
+  constructor() {
+    const activatedRoute = this.activatedRoute;
+
     const initialSearch = this.transactionsService.getSearch();
     this.searchControl.setValue(initialSearch);
     this.searchExpanded = !!initialSearch;
@@ -58,7 +60,7 @@ export class TransactionsComponent {
       }
 
       this.toggleOffAllFilters();
-      for (let filterName of filterNames) {
+      for (const filterName of filterNames) {
         const filter = this.allFilters.find(
           (f) => this.convertFilterNameToParam(f.name) === filterName
         );
@@ -132,7 +134,7 @@ export class TransactionsComponent {
   }
 
   private toggleOffAllFilters() {
-    for (let filter of this.allFilters) {
+    for (const filter of this.allFilters) {
       this.toggleFilter(filter, false);
     }
   }

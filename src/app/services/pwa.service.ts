@@ -1,5 +1,5 @@
 import { Platform } from '@angular/cdk/platform';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { timer, take } from 'rxjs';
 import { PromptComponent } from '../components/prompt/prompt.component';
@@ -9,16 +9,14 @@ import { LocalStorageService } from './local-storage.service';
   providedIn: 'root',
 })
 export class PwaService {
+  private bottomSheet = inject(MatBottomSheet);
+  private platform = inject(Platform);
+  private localStorage = inject(LocalStorageService);
+
   private static readonly LAST_PROMPTED_KEY = 'last_prompted_pwa';
   private static readonly PROMPT_REFRACTORY_PERIOD = 7 * 24 * 60 * 60 * 1000; // milliseconds
   private static readonly PROMPT_INITIAL_DELAY = 60 * 1000; // milliseconds
   private promptEvent: any;
-
-  constructor(
-    private bottomSheet: MatBottomSheet,
-    private platform: Platform,
-    private localStorage: LocalStorageService
-  ) {}
 
   public initPwaPrompt() {
     if (this.platform.ANDROID) {
@@ -31,7 +29,7 @@ export class PwaService {
     if (this.platform.IOS) {
       const isInStandaloneMode =
         'standalone' in window.navigator &&
-        (<any>window.navigator)['standalone'];
+        (window.navigator as any)['standalone'];
       if (!isInStandaloneMode) {
         this.openPromptComponent('ios');
       }

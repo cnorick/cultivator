@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, map, Observable, of, skip } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -21,6 +21,11 @@ interface StoredGoogleToken {
   providedIn: 'root',
 })
 export class GoogleAuthService {
+  private localStorage = inject(LocalStorageService);
+  private logger = inject(LogService);
+  private router = inject(Router);
+  private http = inject(HttpClient);
+
   private static readonly TOKEN_STORAGE_KEY = 'google_access_token';
   private static readonly EXISTING_USER_STORAGE_KEY = 'has_logged_in_before';
 
@@ -81,12 +86,7 @@ export class GoogleAuthService {
       );
   }
 
-  constructor(
-    private localStorage: LocalStorageService,
-    private logger: LogService,
-    private router: Router,
-    private http: HttpClient
-  ) {
+  constructor() {
     this.token$.pipe(skip(1)).subscribe((token) => {
       if (!token && this.existingUser) {
         this.reauthenticate();

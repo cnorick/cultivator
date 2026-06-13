@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import {
@@ -101,17 +101,15 @@ export interface BatchUpdateResponse {
   providedIn: 'root',
 })
 export class GoogleSheetsClientService {
+  private auth = inject(GoogleAuthService);
+  private http = inject(HttpClient);
+  private logger = inject(LogService);
+  private snackbar = inject(MatSnackBar);
+  private router = inject(Router);
+
   private readonly endpoint = 'https://sheets.googleapis.com';
   private readonly version = 'v4';
   private readonly baseUrl = `${this.endpoint}/${this.version}/spreadsheets`;
-
-  constructor(
-    private auth: GoogleAuthService,
-    private http: HttpClient,
-    private logger: LogService,
-    private snackbar: MatSnackBar,
-    private router: Router
-  ) {}
 
   /**
    * Shared error handler for all HTTP requests.
@@ -214,7 +212,7 @@ export class GoogleSheetsClientService {
 
   public getSpreadsheetIdFromUrl(url?: string) {
     return url?.match(
-      /https:\/\/docs.google.com\/spreadsheets\/d\/([^\/]*)/
+      /https:\/\/docs\.google\.com\/spreadsheets\/d\/([^/]*)/
     )?.[1];
   }
 

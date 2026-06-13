@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
 import { FeaturesService } from 'src/app/services/features.service';
@@ -12,12 +12,11 @@ import { CATEGORY_LOADING_VAL } from 'src/app/types/category';
     standalone: false
 })
 export class InfoContainerComponent {
+  private transactionsService = inject(TransactionsService);
+  private activatedRoute = inject(ActivatedRoute);
+  private featuresService = inject(FeaturesService);
+
   readonly CATEGORY_LOADING_VAL = CATEGORY_LOADING_VAL;
-  constructor(
-    private transactionsService: TransactionsService,
-    private activatedRoute: ActivatedRoute,
-    private featuresService: FeaturesService
-  ) {}
 
   transaction$ = combineLatest([
     this.activatedRoute.parent!.paramMap,

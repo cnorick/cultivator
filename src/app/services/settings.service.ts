@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, distinctUntilChanged, map } from 'rxjs';
 import { LocalStorageService } from './local-storage.service';
 
@@ -54,7 +54,9 @@ export class SettingsService {
     distinctUntilChanged()
   );
 
-  constructor(localStorage: LocalStorageService) {
+  constructor() {
+    const localStorage = inject(LocalStorageService);
+
     const storedSettings: Settings = JSON.parse(
       localStorage.getItem(SettingsService.SETTINGS_STORAGE_KEY) ?? '{}'
     );

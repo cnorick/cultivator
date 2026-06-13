@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Category } from '../types/category';
 import { GoogleSheetsService } from './google-sheets.service';
@@ -7,7 +7,8 @@ import { GoogleSheetsService } from './google-sheets.service';
   providedIn: 'root',
 })
 export class CategoryService {
-  constructor(private googleSheets: GoogleSheetsService) {}
+  private googleSheets = inject(GoogleSheetsService);
+
 
   public categories$ = (
     this.googleSheets.categoryData$ as unknown as Observable<Category[]>

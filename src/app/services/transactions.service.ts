@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   BehaviorSubject,
   combineLatest,
@@ -22,7 +22,7 @@ export type TransactionFilter = (
   transactions?: Transaction[]
 ) => boolean;
 
-export type TransactionSplit = {
+export interface TransactionSplit {
   category: string;
   amount: number;
 }
@@ -31,10 +31,9 @@ export type TransactionSplit = {
   providedIn: 'root',
 })
 export class TransactionsService {
-  constructor(
-    private googleSheets: GoogleSheetsService,
-    private settings: SettingsService
-  ) {}
+  private googleSheets = inject(GoogleSheetsService);
+  private settings = inject(SettingsService);
+
 
   private loadMoreSteps$ = new BehaviorSubject(1);
   private limit$ = combineLatest([

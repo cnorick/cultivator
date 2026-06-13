@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { distinctUntilChanged, filter, map, startWith } from 'rxjs';
 import { BreadCrumb } from '../components/breadcrumbs/breadcrumbs.component';
@@ -7,14 +7,15 @@ import { BreadCrumb } from '../components/breadcrumbs/breadcrumbs.component';
   providedIn: 'root',
 })
 export class BreadcrumbsService {
+  private router = inject(Router);
+  private activatedRoute = inject(ActivatedRoute);
+
   public readonly breadcrumbs$ = this.router.events.pipe(
     filter((event) => event instanceof NavigationEnd),
     distinctUntilChanged(),
     map(() => this.buildBreadCrumb(this.activatedRoute.root)),
     startWith(null)
   );
-
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
 
   /**
    * Recursively build breadcrumb according to activated route.
@@ -24,7 +25,7 @@ export class BreadcrumbsService {
    */
   private buildBreadCrumb(
     route: ActivatedRoute,
-    url: string = '',
+    url = '',
     breadcrumbs: BreadCrumb[] = []
   ): BreadCrumb[] {
     //If no routeConfig is avalailable we are on the root path
@@ -32,7 +33,7 @@ export class BreadcrumbsService {
       route.routeConfig && route.routeConfig.data
         ? route.routeConfig.data['breadcrumb']
         : '';
-    let isClickable =
+    const isClickable =
       route.routeConfig &&
       route.routeConfig.data &&
       route.routeConfig.data['isClickable'];

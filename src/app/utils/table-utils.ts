@@ -1,7 +1,7 @@
 export function convertTableToDictArray(
   headers: (string | number)[],
   data: (string | number)[][]
-): { [key: string]: string }[] {
+): Record<string, string>[] {
   const cleanHeaders = headers.map((h) => normalizeHeader(h));
 
   return data.map((row) =>

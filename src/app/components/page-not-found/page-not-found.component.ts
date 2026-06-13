@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 @Component({
     selector: 'app-page-not-found-component',
@@ -8,7 +8,8 @@ import { Component } from '@angular/core';
     standalone: false
 })
 export class PageNotFoundComponent {
-  constructor(private location: Location) {}
+  private location = inject(Location);
+
 
   goBack() {
     this.location.back();

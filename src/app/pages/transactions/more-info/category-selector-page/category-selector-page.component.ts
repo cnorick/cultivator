@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
 import { CategorySelectorComponent } from 'src/app/components/category-selector/category-selector.component';
@@ -13,14 +13,12 @@ import { Transaction } from 'src/app/types/transaction';
     standalone: false
 })
 export class CategorySelectorPageComponent implements AfterViewInit {
+  private transactionsService = inject(TransactionsService);
+  private activatedRoute = inject(ActivatedRoute);
+  private router = inject(Router);
+
   @ViewChild(CategorySelectorComponent)
   categorySelector!: CategorySelectorComponent;
-
-  constructor(
-    private transactionsService: TransactionsService,
-    private activatedRoute: ActivatedRoute,
-    private router: Router
-  ) {}
 
   ngAfterViewInit(): void {
     if (this.categorySelector) {

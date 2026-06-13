@@ -1,14 +1,4 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-  ViewChild,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { combineLatest, map, startWith, Subject, takeUntil } from 'rxjs';
@@ -22,7 +12,10 @@ import FuzzySearch from 'fuzzy-search';
     styleUrls: ['./category-selector.component.scss'],
     standalone: false
 })
-export class CategorySelectorComponent implements OnInit, OnDestroy {
+export class CategorySelectorComponent implements OnDestroy {
+  private categoryService = inject(CategoryService);
+  private cdr = inject(ChangeDetectorRef);
+
   @Input()
   set selectedCategory(val: string | undefined) {
     this._selectedCategory = val;
@@ -47,16 +40,11 @@ export class CategorySelectorComponent implements OnInit, OnDestroy {
   categoryCtl = new FormControl('None');
   filteredCategories: Category[] = [];
 
-  constructor(
-    private categoryService: CategoryService,
-    private cdr: ChangeDetectorRef
-  ) {
+  constructor() {
     this.filteredCategories$
       .pipe(takeUntil(this.destroy$))
       .subscribe((categories) => (this.filteredCategories = categories));
   }
-
-  ngOnInit(): void {}
 
   ngOnDestroy(): void {
     this.destroy$.next();

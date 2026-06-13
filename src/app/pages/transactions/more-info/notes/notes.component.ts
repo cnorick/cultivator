@@ -1,10 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  ViewChild,
-} from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
 import { TransactionsService } from 'src/app/services/transactions.service';
@@ -18,13 +12,12 @@ import { Transaction } from 'src/app/types/transaction';
     standalone: false
 })
 export class NotesComponent implements AfterViewInit {
+  private transactionsService = inject(TransactionsService);
+  private activatedRoute = inject(ActivatedRoute);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+
   @ViewChild('input') inputEl!: ElementRef<HTMLTextAreaElement>;
-  constructor(
-    private transactionsService: TransactionsService,
-    private activatedRoute: ActivatedRoute,
-    private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
 
   ngAfterViewInit(): void {
     this.focus();

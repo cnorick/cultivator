@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,6 +12,10 @@ import { Category } from 'src/app/types/category';
     standalone: false
 })
 export class NewTransferComponent {
+  private transactionsService = inject(TransactionsService);
+  private router = inject(Router);
+  private activatedRoute = inject(ActivatedRoute);
+
   newTransferForm = new FormGroup({
     amount: new FormControl<number | null>(null, [
       Validators.required,
@@ -45,12 +49,6 @@ export class NewTransferComponent {
   get amount() {
     return this.newTransferForm.get('amount');
   }
-
-  constructor(
-    private transactionsService: TransactionsService,
-    private router: Router,
-    private activatedRoute: ActivatedRoute
-  ) {}
 
   onSubmit() {
     if (!this.newTransferForm.valid) {

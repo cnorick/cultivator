@@ -41,7 +41,14 @@ describe('SettingsService', () => {
     );
 
     // Reinitialize to trigger constructor load
-    const newService = new SettingsService(mockLocalStorage);
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        SettingsService,
+        { provide: LocalStorageService, useValue: mockLocalStorage },
+      ],
+    });
+    const newService = TestBed.inject(SettingsService);
     newService.settings$.subscribe((settings) => {
       expect(settings.spreadsheetId).toBe('some-sheet-id');
       expect(settings.refreshRateSeconds).toBe(30);

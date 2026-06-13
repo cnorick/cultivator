@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   combineLatest,
   catchError,
@@ -51,6 +51,11 @@ const WRITE_RETRY_COUNT = 3;
   providedIn: 'root',
 })
 export class GoogleSheetsService {
+  private googleClient = inject(GoogleSheetsClientService);
+  private settings = inject(SettingsService);
+  private auth = inject(GoogleAuthService);
+  private snackbar = inject(MatSnackBar);
+
   private static readonly METADATA_KEY = 'cultivator';
 
   // --- Write queue ---
@@ -106,7 +111,7 @@ export class GoogleSheetsService {
         )
       ),
       map((metadataEntry) =>
-        !!metadataEntry?.metadataValue
+        metadataEntry?.metadataValue
           ? (JSON.parse(metadataEntry.metadataValue) as CultivatorMetadata)
           : null
       ),
@@ -327,13 +332,9 @@ export class GoogleSheetsService {
     }
   }
 
-  constructor(
-    private googleClient: GoogleSheetsClientService,
-    private settings: SettingsService,
-    private auth: GoogleAuthService,
-    private snackbar: MatSnackBar,
-    logger: LogService
-  ) {
+  constructor() {
+    const logger = inject(LogService);
+
     // --- Logging subscriptions ---
     this.allSheetsResponse$.subscribe((res) => logger.log(res));
     this.transactionsSheetInfo$.subscribe((res) => logger.log(res));

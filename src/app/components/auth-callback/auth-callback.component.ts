@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthState } from 'src/app/types/auth-state';
 import { GoogleAuthService } from '../../services/google-auth.service';
@@ -9,12 +9,11 @@ import { GoogleAuthService } from '../../services/google-auth.service';
     styleUrls: ['./auth-callback.component.scss'],
     standalone: false
 })
-export class AuthCallbackComponent {
-  constructor(
-    private activatedRoute: ActivatedRoute,
-    private googleAuthService: GoogleAuthService,
-    private router: Router
-  ) {}
+export class AuthCallbackComponent implements OnInit {
+  private activatedRoute = inject(ActivatedRoute);
+  private googleAuthService = inject(GoogleAuthService);
+  private router = inject(Router);
+
 
   ngOnInit() {
     this.activatedRoute.fragment.subscribe((fragment) => {

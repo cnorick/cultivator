@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { GoogleAuthService } from 'src/app/services/google-auth.service';
 
 @Component({
@@ -8,7 +8,8 @@ import { GoogleAuthService } from 'src/app/services/google-auth.service';
     standalone: false
 })
 export class AboutComponent {
-  constructor(private googleAuth: GoogleAuthService) {}
+  private googleAuth = inject(GoogleAuthService);
+
 
   loggedIn$ = this.googleAuth.loggedIn$;
 }

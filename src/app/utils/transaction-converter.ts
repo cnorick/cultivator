@@ -1,7 +1,7 @@
 import { Transaction } from '../types/transaction';
 import { parseLotusDate } from './date-utils';
 
-type DataDict = { [key: string]: string | number | undefined };
+type DataDict = Record<string, string | number | undefined>;
 
 export function convertDataDictToTransaction(
   dict: DataDict,

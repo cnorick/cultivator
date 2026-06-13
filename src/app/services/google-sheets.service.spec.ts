@@ -91,6 +91,7 @@ describe('GoogleSheetsService', () => {
     mockGoogleClient.getAllSheets.and.returnValue(of(mockSpreadsheetsResponse));
 
     mockGoogleClient.getSpreadsheetValues.and.callFake((id: string, range: string) => {
+      console.log('SPY: getSpreadsheetValues called with:', { id, range });
       if (range.includes('Transactions')) {
         return of(mockTransactionValues);
       } else {
@@ -129,17 +130,22 @@ describe('GoogleSheetsService', () => {
       ],
     });
 
+  });
+
+  function setupService() {
     service = TestBed.inject(GoogleSheetsService);
     // Keep data streams warm to match app behavior and prevent pauseWhen deadlock
     service.transactionData$.subscribe();
     service.categoryData$.subscribe();
-  });
+  }
 
   it('should be created', () => {
+    setupService();
     expect(service).toBeTruthy();
   });
 
   it('should load developer metadata on init', (done) => {
+    setupService();
     service.cultivatorGlobalDeveloperMetadataValue$.subscribe((meta) => {
       expect(meta).toEqual({ test: 'metadata' } as any);
       done();
@@ -147,6 +153,7 @@ describe('GoogleSheetsService', () => {
   });
 
   it('should format transaction data correctly', (done) => {
+    setupService();
     service.transactionData$.subscribe((data) => {
       expect(data).toEqual([
         { date: 44562, description: 'Groceries', amount: 50.0, category: 'Food' },
@@ -156,6 +163,7 @@ describe('GoogleSheetsService', () => {
   });
 
   it('should format category data correctly', (done) => {
+    setupService();
     service.categoryData$.subscribe((data) => {
       expect(data).toEqual([
         { category: 'Food', budget: 500 },
@@ -166,29 +174,35 @@ describe('GoogleSheetsService', () => {
 
   describe('write queue serialization', () => {
     it('should process writes sequentially via concatMap (second write waits for first)', fakeAsync(() => {
+      setupService();
       // Let initial data load
       tick(100);
 
       const callOrder: string[] = [];
 
       mockGoogleClient.updateRow.and.callFake(() => {
-        console.log('SPY EXECUTED!');
         callOrder.push('spy');
-        return throwError(() => new Error('Network error'));
+        return of({ spreadsheetId: 'sheet-123', updatedRange: '', updatedRows: 1, updatedColumns: 4, updatedCells: 4 } as ValuesUpdateResponse).pipe(
+          delay(200)
+        );
       });
 
-      console.log('CALLING UPDATE ROW');
       service.updateTransactionsRow(2, { date: '1/1/2023', description: 'A', amount: 10, category: 'Food' });
-      console.log('CALLED UPDATE ROW');
+      service.updateTransactionsRow(3, { date: '1/2/2023', description: 'B', amount: 20, category: 'Food' });
 
-      flushMicrotasks();
-      flush();
-      
-      console.log('CALL ORDER:', callOrder);
+      // After 100ms, first write is in progress. Second write hasn't started yet.
+      tick(100);
       expect(callOrder).toEqual(['spy']);
+
+      // After another 200ms (total 300ms), first write completes, second starts.
+      tick(200);
+      expect(callOrder).toEqual(['spy', 'spy']);
+
+      flush();
     }));
 
     it('should not cancel an in-flight write when a new write arrives', fakeAsync(() => {
+      setupService();
       // Let initial data load
       tick(100);
 
@@ -204,8 +218,9 @@ describe('GoogleSheetsService', () => {
       service.updateTransactionsRow(2, { date: '1/1/2023', description: 'A', amount: 10, category: 'Food' });
       service.updateTransactionsRow(3, { date: '1/2/2023', description: 'B', amount: 20, category: 'Food' });
 
-      // Let both complete
-      flushMicrotasks();
+      // First write executes immediately, completes in 200ms.
+      // Second write is queued via concatMap, starts after 200ms, completes in another 200ms.
+      tick(500);
       flush();
 
       // Both calls should have been made (not cancelled)
@@ -215,6 +230,7 @@ describe('GoogleSheetsService', () => {
 
   describe('retry behavior', () => {
     it('should retry a failed write up to 3 times then show snackbar', fakeAsync(() => {
+      setupService();
       // Wait for initial data load so transactionHeaders$ and transactionSheetTitle$ are available
       tick(100);
 
@@ -226,6 +242,8 @@ describe('GoogleSheetsService', () => {
 
       service.updateTransactionsRow(2, { date: '1/1/2023', description: 'A', amount: 10, category: 'Food' });
 
+      // Retries are delayed: 2s, 4s, 8s. Tick at least 15s to cover all retries.
+      tick(15000);
       flush();
       expect(callCount).toBe(4); // 1 initial + 3 retries
       expect(mockSnackbar.open).toHaveBeenCalledWith(
@@ -236,6 +254,7 @@ describe('GoogleSheetsService', () => {
     }));
 
     it('should succeed if a write fails then succeeds on retry', fakeAsync(() => {
+      setupService();
       tick(100);
 
       let callCount = 0;
@@ -249,12 +268,15 @@ describe('GoogleSheetsService', () => {
 
       service.updateTransactionsRow(2, { date: '1/1/2023', description: 'A', amount: 10, category: 'Food' });
 
+      // First retry is delayed by 2s, second retry by 4s. Tick 10s.
+      tick(10000);
       flush();
       expect(callCount).toBe(3);
       expect(mockSnackbar.open).not.toHaveBeenCalled();
     }));
 
     it('should not block subsequent writes after a failed write', fakeAsync(() => {
+      setupService();
       tick(100);
 
       let callCount = 0;
@@ -269,14 +291,17 @@ describe('GoogleSheetsService', () => {
       service.updateTransactionsRow(2, { date: '1/1/2023', description: 'Fail', amount: 10, category: 'Food' });
       service.updateTransactionsRow(3, { date: '1/2/2023', description: 'Succeed', amount: 20, category: 'Food' });
 
-
-      // Drain debounce
-      tick(500);
+      // First write fails 4 times (taking ~15s total retry delays).
+      // Then second write executes. Tick to allow all of this to happen.
+      tick(20000);
+      flush();
+      expect(callCount).toBe(5); // 4 for first write, 1 for second write
     }));
   });
 
   describe('debounced refresh', () => {
     it('should trigger a single refresh after multiple writes drain', fakeAsync(() => {
+      setupService();
       // Track calls to getSpreadsheetValues after the initial load
       let getValuesCallCount = 0;
 

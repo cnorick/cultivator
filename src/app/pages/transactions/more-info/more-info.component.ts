@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, map } from 'rxjs';
 import { TransactionsService } from 'src/app/services/transactions.service';
@@ -10,10 +10,9 @@ import { TransactionsService } from 'src/app/services/transactions.service';
     standalone: false
 })
 export class MoreInfoComponent {
-  constructor(
-    private transactionsService: TransactionsService,
-    private activatedRoute: ActivatedRoute
-  ) {}
+  private transactionsService = inject(TransactionsService);
+  private activatedRoute = inject(ActivatedRoute);
+
 
   transaction$ = combineLatest([
     this.activatedRoute.paramMap,

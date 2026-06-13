@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   ActivatedRoute,
   NavigationCancel,
@@ -19,16 +19,16 @@ import { GoogleSheetsService } from './services/google-sheets.service';
   standalone: false,
 })
 export class AppComponent {
+  private auth = inject(GoogleAuthService);
+  private router = inject(Router);
+  private breadcrumbs = inject(BreadcrumbsService);
+  activatedRoute = inject(ActivatedRoute);
+  private googleSheetsService = inject(GoogleSheetsService);
+
   // Sets initial value to true to show loading spinner on first load
   loading = true;
 
-  constructor(
-    private auth: GoogleAuthService,
-    private router: Router,
-    private breadcrumbs: BreadcrumbsService,
-    public activatedRoute: ActivatedRoute,
-    private googleSheetsService: GoogleSheetsService
-  ) {
+  constructor() {
     this.router.events.subscribe((e) => {
       this.navigationInterceptor(e);
     });

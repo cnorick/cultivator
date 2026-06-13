@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SwUpdate } from '@angular/service-worker';
 
@@ -6,6 +6,8 @@ import { SwUpdate } from '@angular/service-worker';
   providedIn: 'root',
 })
 export class SWUpdateService {
+  private snackbar = inject(MatSnackBar);
+
   private askUserToUpdate() {
     this.snackbar
       .open('A new version of the app is available', 'Update Now', {
@@ -15,7 +17,9 @@ export class SWUpdateService {
       .subscribe(() => document.location.reload());
   }
 
-  constructor(updates: SwUpdate, private snackbar: MatSnackBar) {
+  constructor() {
+    const updates = inject(SwUpdate);
+
     updates.versionUpdates.subscribe((evt) => {
       switch (evt.type) {
         case 'VERSION_DETECTED':

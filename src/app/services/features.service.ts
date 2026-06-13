@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { map, shareReplay, startWith } from 'rxjs';
 import { GoogleSheetsService } from './google-sheets.service';
 
@@ -8,7 +8,8 @@ export const NOTES_HEADER = 'Notes';
   providedIn: 'root',
 })
 export class FeaturesService {
-  constructor(private googleSheetsService: GoogleSheetsService) {}
+  private googleSheetsService = inject(GoogleSheetsService);
+
 
   public readonly notesEnabled$ =
     this.googleSheetsService.transactionHeaders$.pipe(

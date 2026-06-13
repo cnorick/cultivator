@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { BreadcrumbsService } from 'src/app/services/breadcrumbs.service';
 
 export interface BreadCrumb {
@@ -13,7 +13,8 @@ export interface BreadCrumb {
     standalone: false
 })
 export class BreadcrumbsComponent {
-  constructor(private breadcrumbsService: BreadcrumbsService) {}
+  private breadcrumbsService = inject(BreadcrumbsService);
+
 
   readonly breadcrumbs$ = this.breadcrumbsService.breadcrumbs$;
 }
