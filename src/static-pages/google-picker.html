@@ -4,10 +4,66 @@
 <head>
   <title>Pick Your Tiller Spreadsheet</title>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: Roboto, "Helvetica Neue", sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #303030;
+      color: rgba(255, 255, 255, 0.87);
+    }
+    @media (prefers-color-scheme: light) {
+      body {
+        background-color: #fafafa;
+        color: rgba(0, 0, 0, 0.87);
+      }
+    }
+    h1 {
+      font-weight: 400;
+      text-align: center;
+      margin-bottom: 0.5em;
+    }
+    p.subtitle {
+      text-align: center;
+      opacity: 0.7;
+    }
+    .container {
+      padding: 2em;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .open-picker-btn {
+      background-color: #009688; /* Material Teal 500 */
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);
+      margin-top: 1.5em;
+      transition: background-color 0.2s;
+    }
+    .open-picker-btn:hover {
+      background-color: #00897b;
+    }
+  </style>
 </head>
 
 <body>
-  <p>Pick Your Tiller Spreadsheet</p>
+  <div class="container">
+    <h1>Pick Your Tiller Spreadsheet</h1>
+    <p class="subtitle">Please select your Tiller spreadsheet from the Google Picker dialog.</p>
+    <button class="open-picker-btn" onclick="createPicker()">Open Picker</button>
+  </div>
 
   <!--Add buttons to initiate auth sequence and sign out-->
   <pre id="content" style="white-space: pre-wrap;"></pre>
@@ -66,12 +122,16 @@
      */
     function createPicker() {
       const view = new google.picker.View(google.picker.ViewId.SPREADSHEETS);
+      const width = window.innerWidth > 800 ? 800 : window.innerWidth - 20;
+      const height = window.innerHeight > 600 ? 600 : window.innerHeight - 20;
+
       const picker = new google.picker.PickerBuilder()
         .enableFeature(google.picker.Feature.NAV_HIDDEN)
         // .setDeveloperKey(API_KEY)
         .setAppId(APP_ID)
         .setOAuthToken(accessToken)
         .addView(view)
+        .setSize(width, height)
         .setCallback(pickerCallback)
         .build();
       picker.setVisible(true);
