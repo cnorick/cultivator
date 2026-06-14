@@ -5,6 +5,7 @@ import {
   map,
   shareReplay,
   startWith,
+  tap,
 } from 'rxjs';
 import { Category, CATEGORY_LOADING_VAL } from '../types/category';
 import { Transaction } from '../types/transaction';
@@ -44,14 +45,37 @@ export class TransactionsService {
   private filters$ = new BehaviorSubject<TransactionFilter[]>([]);
   private searchTerm$ = new BehaviorSubject<string>('');
 
-  public readonly transactions$ = this.googleSheets.transactionData$.pipe(
-    map((transactions) =>
-      transactions.map<Transaction>((t, i) =>
-        convertDataDictToTransaction(t, i)
-      )
+  private loadingTransactions$ = new BehaviorSubject<Set<string>>(new Set());
+
+  public readonly transactions$ = combineLatest([
+    this.googleSheets.transactionData$.pipe(
+      // Clear loading state when new data arrives
+      tap(() => this.loadingTransactions$.next(new Set()))
+    ),
+    this.loadingTransactions$
+  ]).pipe(
+    map(([transactions, loadingSet]) =>
+      transactions.map<Transaction>((t, i) => {
+        const transaction = convertDataDictToTransaction(t, i);
+        if (transaction.transaction_id && loadingSet.has(transaction.transaction_id)) {
+          transaction.category = CATEGORY_LOADING_VAL;
+          transaction.notes = CATEGORY_LOADING_VAL;
+        }
+        return transaction;
+      })
     ),
     shareReplay()
   );
+
+  public setTransactionLoading(id: string, isLoading: boolean) {
+    const current = new Set(this.loadingTransactions$.value);
+    if (isLoading) {
+      current.add(id);
+    } else {
+      current.delete(id);
+    }
+    this.loadingTransactions$.next(current);
+  }
 
   public readonly shownTransactions$ = combineLatest([
     this.transactions$,
@@ -96,13 +120,13 @@ export class TransactionsService {
   public updateCategory(transaction: Transaction, category: Category) {
     const dataDict = { ...transaction.original, category: category.category };
 
-    transaction.category = CATEGORY_LOADING_VAL;
+    this.setTransactionLoading(transaction.transaction_id!, true);
     this.googleSheets.updateTransactionsRow(transaction.sheetsRow, dataDict);
   }
 
   public updateNotes(transaction: Transaction, notes: string) {
     const dataDict = { ...transaction.original, notes };
-    transaction.notes = CATEGORY_LOADING_VAL;
+    this.setTransactionLoading(transaction.transaction_id!, true);
 
     this.googleSheets.updateTransactionsRow(transaction.sheetsRow, dataDict);
   }
@@ -127,6 +151,7 @@ export class TransactionsService {
     console.log('Splitting transaction', transaction, 'into', splits);
 
     // Update the original transaction with firstSplit.
+    this.setTransactionLoading(transaction.transaction_id!, true);
     this.googleSheets.updateTransactionsRow(transaction.sheetsRow, {
       ...transaction.original,
       category: firstSplit.category,
