@@ -15,7 +15,12 @@
     "lint": "ng lint",
     "lint:fix": "ng lint --fix"
   },
-  "private": true,
+  "description": "An open source budget app for Tiller.",
+  "author": "Open Source Contributors",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/taters-budget-app-for-tiller.git"
+  },
   "dependencies": {
     "@angular/animations": "^20.1.3",
     "@angular/cdk": "^20.1.3",

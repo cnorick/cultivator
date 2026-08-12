@@ -1,27 +1,66 @@
-# TillerWebApp
+# Cultivator
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.1.4.
+An Angular-based open-source budget application built to interface seamlessly with Tiller. Manage your finances, view transaction history, and stay on budget with a responsive, easy-to-use interface.
 
-## Development server
+https://cultivator.nathanorick.com/
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Features
 
-## Code scaffolding
+- **Google Authentication:** Secure login using your Google Account.
+- **Tiller Integration:** Interface with your Tiller spreadsheets for tracking.
+- **Budget Monitoring:** Visualize and track your budget quickly and efficiently.
+- **Open Source & Extensible:** Modify the dashboard to suit your personal financial needs.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+![](docs/images/transaction_list.png)
+![](docs/images/transaction.png)
+![](docs/images/category.png)
 
-## Build
+## Getting Started
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
-## Running unit tests
+### Prerequisites
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Make sure you have Node.js and NPM installed:
+- [Node.js](https://nodejs.org/) (Use the version specified in `.nvmrc`)
+- Angular CLI (`npm install -g @angular/cli`)
 
-## Running end-to-end tests
+### Installation
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/<YOUR_USERNAME>/taters-budget-app-for-tiller.git
+   cd taters-budget-app-for-tiller
+   ```
 
-## Further help
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+3. **Set up Environment Variables**
+   The application requires a Google Client ID to handle authentication.
+   - Copy the example `.env` file:
+     ```bash
+     cp .env.example .env
+     ```
+   - Open `.env` and replace `your-google-client-id` with your actual Google Client ID from the Google Cloud Console.
+
+4. **Start the Development Server**
+   ```bash
+   npm start
+   ```
+   Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+
+## Running Tests
+
+- **Unit tests:** Run `npm run test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+- **Linter:** Run `npm run lint` to check for code style issues.
+
+## Contributing
+
+We welcome contributions! Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to open issues, submit pull requests, and our coding standards.
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
