@@ -19,7 +19,7 @@
   "author": "Open Source Contributors",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/taters-budget-app-for-tiller.git"
+    "url": "https://github.com/cnorick/cultivator.git"
   },
   "dependencies": {
     "@angular/animations": "^20.1.3",

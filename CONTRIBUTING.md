@@ -1,6 +1,6 @@
-# Contributing to Taters Budget App
+# Contributing to Cultivator
 
-First off, thank you for considering contributing to the Taters Budget App! It's people like you that make open source such a great community.
+First off, thank you for considering contributing to the Cultivator! It's people like you that make open source such a great community.
 
 ## How Can I Contribute?
 

@@ -29,8 +29,8 @@ Make sure you have Node.js and NPM installed:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/<YOUR_USERNAME>/taters-budget-app-for-tiller.git
-   cd taters-budget-app-for-tiller
+   git clone https://github.com/<YOUR_USERNAME>/cultivator.git
+   cd cultivator
    ```
 
 2. **Install dependencies**
